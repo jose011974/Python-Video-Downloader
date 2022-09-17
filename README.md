@@ -33,9 +33,9 @@ Just in case something doesnt work, here are all of the libraries used in the sc
 * subprocess
 * sys
 
-*These you will have to download from PyPI*
-
 **3rd-Party Libraries:**
+
+*These you will have to download from PyPI*
 
 * Colorama
 * magic
