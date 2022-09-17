@@ -53,13 +53,13 @@ If the script does not run, please check the Troubleshooting section below.
 
 If no errors occur, then you will be presented with a menu consisting of the following choices:
 
- * 1. Single File     - Compress one file
+ /* 1. Single File     - Compress one file
  * 2. Multiple Files - Compress multiple files
  * 3. Single URL     - Download and compress one file
  * 4. Multiple URLs  - Download and compress
  * 5. Spoil media    - Make media "spoiled" to send on Discord
  * 6. Help           - Opens this page
- * 7. Exit           - I don't need to tell you what this does.
+ * 7. Exit           - I don't need to tell you what this does./
 
 The choices should be self explanitory. I have tried to make the process simple and efficient. 
 
