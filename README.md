@@ -128,9 +128,20 @@ Another reason why the script may fail is due to not having the proper permissio
 
 ## 3. Unable to Download Media
 
+This script uses [Youtube-DL](https://github.com/ytdl-org/youtube-dl) for the actuall downloading of the media. 
+
+The short version of how it works:
+
+* 1. Youtube-DL tries to find an extractor based on the domain of the website. For example, there are extractors for Twitter, Instagram, and Youtube.
+* 2. If an extractor is found, it then tries to find the direct link of the media in question (Video, GIF, Audio, Image) and downloads the media.
+* 3. If an extractor is **NOT** found, it falls back to a generic extractor, which tires to look throughout the entire page for any information on the media. [Reference](https://github.com/ytdl-org/youtube-dl/blob/7009bb9f3182449ae8cc05cc28b768b63030a485/youtube_dl/extractor/common.py#L87)
+If no media information is found, it will throw out an error and you must find the direct link yourself.
+
+You can try right clicking the media in question and clicking "Copy Image/Video address". You can also use the Inspect Element tool (F12) to look through the HTML Markup of the webpage and find the direct link. Sometikmes is buried deep inside the code.
+
 If the script throws a 404 not found error, you can try to access the link in question to determine if its a bug or a feature.
 
-If you ARE able to access the link, create an issue with the following information:
+If you ARE able to access the link, then its a bug. Create an issue with the following information:
 
 * Python version
 * Dependency versions
