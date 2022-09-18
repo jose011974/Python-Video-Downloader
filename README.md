@@ -139,7 +139,7 @@ Another reason why the script may fail is due to not having the proper permissio
 
 ## 3. Unable to Download Media
 
-* This script uses [Youtube-DL](https://github.com/ytdl-org/youtube-dl) for the actuall downloading of the media. 
+This script uses [Youtube-DL](https://github.com/ytdl-org/youtube-dl) for the actual downloading of the media. 
 
 The short version of how it works:
 
@@ -150,6 +150,8 @@ The short version of how it works:
 * If no media information is found, it will throw out an error and you must find the direct link yourself.
 
 * You can try right clicking the media in question and clicking "Copy Image/Video address". You can also use the Inspect Element tool (F12) to look through the HTML Markup of the webpage and find the direct link. Sometikmes is buried deep inside the code.
+
+---
 
 If the script throws a 404 not found error, you can try to access the link in question to determine if its a bug or a feature.
 
