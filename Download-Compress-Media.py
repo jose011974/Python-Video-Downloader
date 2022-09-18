@@ -66,6 +66,7 @@ import re
 import requests
 import time
 import validators
+import webbrowser
 import youtube_dl
 
 from pathlib import Path
@@ -771,19 +772,11 @@ def main():
             elif userInput == 5:
                 spoil()
             elif userInput == 6:
-                uri = "https://pastebin.com/SXjsn70y"
-                helpFile = requests.get(uri)
-
-                open("readme.txt", 'wb').write(helpFile.content)
-
-                if platform.system() == "Windows":
-                    os.startfile("help.txt")
-                else:
-                    subprocess.call(('xdg-open', "help.txt"))
+                webbrowser.open("https://github.com/jose011974/Download-Compress-Media", new=1)
 
                 clear()
 
-                print("A help file should have opened. If it did not, please go to https://pastebin.com/SXjsn70y\n")
+                print("The Github page should have opened. If it did not, please go to https://github.com/jose011974/Download-Compress-Media\n")
                 print("Press enter to continue.\n")
                 input()
 

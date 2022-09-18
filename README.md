@@ -8,11 +8,13 @@ I am not responsible for any mistakes caused by the script applying a procedure 
 
 # Download-Compress-Media
 
+**Until someone comes up with a better name, this is what we're working with.**
+
 This script can do the following:
 
-* Download media from the internet using Youtube-DL as the backend.
+* Download media from the internet using [Youtube-DL](https://github.com/ytdl-org/youtube-dl) as the backend.
 * Compress media if it's file size is larger than 8 MB; This will allow you to send the media through Discord if you or the server do not have Nitro/Boosts.
-* Append "SPOILER" to file names in order to send them through Discord
+* Append "SPOILER" to file names in order to send them through Discord censored.
 
 # Pre-reqs
 
@@ -39,6 +41,7 @@ Just in case something doesnt work, here are all of the libraries used in the sc
 * time
 * subprocess
 * sys
+* webbrowser
 
 **3rd-Party Libraries:**
 
@@ -62,7 +65,7 @@ If no errors occur, then you will be presented with a menu consisting of the fol
  * 1. Single File    - Compress one file
  * 2. Multiple Files - Compress multiple files
  * 3. Single URL     - Download and compress one file
- * 4. Multiple URLs  - Download and compress
+ * 4. Multiple URLs  - Download and compress multiple files
  * 5. Spoil media    - Make media "spoiled" to send on Discord
  * 6. Help           - Opens this page
  * 7. Exit           - I don't need to tell you what this does.
@@ -71,7 +74,7 @@ The choices should be self explanitory. I have tried to make the process simple 
 
 # Downloading
 
-The process for downloading files is simple.
+The process for downloading files is simple:
 
 1a. Select single URL or multiple URL
 
@@ -106,6 +109,8 @@ The errors are pretty self explaintory. If you think an error should not have oc
 * OS type and version
 * URL that you tried to download
 * Error message
+
+* Current Error Messages
 
 # Troubleshooting
 
