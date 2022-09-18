@@ -401,7 +401,7 @@ def multipleURLConvert():
 
         else:
             clear()
-            print(Back.MAGENTA + "URL.txt" + Style.RESET + "was not found. Please try again.\n")
+            print(Back.MAGENTA + "URL.txt" + Style.RESET_ALL + "was not found. Please try again.\n")
             continue
         
         # Try to cleanup any remaining files in the temp folder. Remove the temp folder once it is empty
