@@ -60,8 +60,6 @@ for p in packages:
 from colorama import Fore, Back, Style, init
 import fileinput
 import magic
-import moviepy.editor as mp
-import moviepy.video.fx.all as vfx
 import psutil
 import shutil
 import re
@@ -71,7 +69,6 @@ import validators
 import youtube_dl
 
 from pathlib import Path
-from PIL import Image
 
 init(autoreset=True) # Initialize colorama
 
@@ -630,7 +627,7 @@ def singleURLConvert():
 
             filename = downFileName.encode('ascii','ignore').decode('ascii')
             fileSize = getFileSize(filename)
-            fullFilePath = str(Path(mediaPath + r'/' + filename))
+            fullFilePath = str(Path(mediaPath + r'/' + "output" + r'/' + filename))
 
             if fileSize > 8192.00:
                 print("The media file has been sucessfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + fullFilePath + Style.RESET_ALL + "\n")

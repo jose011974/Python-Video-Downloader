@@ -38,7 +38,7 @@ Just in case something doesnt work, here are all of the libraries used in the sc
 
 *These you will have to download from PyPI*
 
-* Colorama
+* colorama
 * magic
 * pathlib
 * psutil
@@ -67,9 +67,9 @@ The choices should be self explanitory. I have tried to make the process simple 
 
 The process for downloading files is simple.
 
-1. Select single URL or multiple URL
+1a. Select single URL or multiple URL
 
-2a. Single URL: Paste in the URL in question and press enter. The program will attempt to download the file and save it in the same directory as the script.
+2a. Single URL: Paste in the URL in question and press enter. The program will attempt to download the file and save it in a folder called 'output'
 
 2b. Multiple URLs: Create a text file called URL.txt in the same directory as the script and paste every URL on a new line. You may space out the URLs if it makes you feel better. Then the script will attempt to go through each URL and download the files.
 
