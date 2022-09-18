@@ -53,13 +53,13 @@ If the script does not run, please check the Troubleshooting section below.
 
 If no errors occur, then you will be presented with a menu consisting of the following choices:
 
- /* 1. Single File     - Compress one file
+ * 1. Single File    - Compress one file
  * 2. Multiple Files - Compress multiple files
  * 3. Single URL     - Download and compress one file
  * 4. Multiple URLs  - Download and compress
  * 5. Spoil media    - Make media "spoiled" to send on Discord
  * 6. Help           - Opens this page
- * 7. Exit           - I don't need to tell you what this does./
+ * 7. Exit           - I don't need to tell you what this does.
 
 The choices should be self explanitory. I have tried to make the process simple and efficient. 
 
@@ -100,6 +100,45 @@ The errors are pretty self explaintory. If you think an error should not have oc
 * OS type and version
 * URL that you tried to download
 * Error message
+
+# Troubleshooting
+
+There may be a few reasons why you run into issues running this script.
+
+## 1. Determine if Python is installed, and what version
+
+* Windows:
+  * Open the start menu and type 'cmd'
+  * A window with a black background should open. Click on the window and type 'python'
+  * You should see the following:
+  ![](https://i.imgur.com/YKUT1t4.png)
+  * If you do not see the prompt inside the red box and instead see `'python' is not recognized as an internal or external command, operable program or batch file.` then Python is not installed. There are many resourses available to install Python on Windows. Google is your friend.
+* Mac:
+  * Open the Terminal and type `python`
+  * You should see the following:
+  ![](https://www.applegazette.com/wp-content/uploads/2017/06/python-3-cli-2.png)
+  * _I have no idea how to fix the formatting, the code is the exact same as in the Windows section._
+  * If you do not see the prompt, Python is not installed. There are many resources available to install Python on Mac. Google is your friend.
+* Linux:
+  * TBCompleted
+
+## 2. File/Foler Permissions
+
+Another reason why the script may fail is due to not having the proper permissions for the folder the script is located in. The easiest way to check if you have proper permissions is to create a new text file in the directory the script is located in.
+
+## 3. Unable to Download Media
+
+If the script throws a 404 not found error, you can try to access the link in question to determine if its a bug or a feature.
+
+If you ARE able to access the link, create an issue with the following information:
+
+* Python version
+* Dependency versions
+* OS type and version
+* URL that you tried to download
+* Error message
+
+If you are NOT able to access the link, its a feature.
 
 # Credits / License
 
