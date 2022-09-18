@@ -1,5 +1,11 @@
 I have no idea how to use Github. Please forgive me.
 
+# IMPORTIANT
+
+Unless otherwise noted, the script will look for files in ***ALL*** subfolders. If you only want to work with a specific set of files, please put them in their own folder.
+
+I am not responsible for any mistakes caused by the script applying a procedure to ALL of your files vs. a few files.
+
 # Download-Compress-Media
 
 This script can do the following:
@@ -61,7 +67,7 @@ If no errors occur, then you will be presented with a menu consisting of the fol
  * 6. Help           - Opens this page
  * 7. Exit           - I don't need to tell you what this does.
 
-The choices should be self explanitory. I have tried to make the process simple and efficient. 
+The choices should be self explanitory. I have tried to make the process simple and efficient.
 
 # Downloading
 
@@ -71,7 +77,7 @@ The process for downloading files is simple.
 
 2a. Single URL: Paste in the URL in question and press enter. The program will attempt to download the file and save it in a folder called 'output'
 
-2b. Multiple URLs: Create a text file called URL.txt in the same directory as the script and paste every URL on a new line. You may space out the URLs if it makes you feel better. Then the script will attempt to go through each URL and download the files.
+2b. Multiple URLs: Create a text file called URL.txt in the same directory as the script and paste every URL on a new line. You may space out the URLs if it makes you feel better. Then the script will attempt to go through each URL and download the files. The downloaded files get moved to a temp folder, and when the process is complete, they all get moved to a folder called 'output'.
 
 In either case, if the file is larger than 8 MB (8,192 KB), the script will ask if you want to compress it. Multiple URLs will ask for compression when downloading is complete.
 
@@ -87,7 +93,7 @@ For PNG files, the script always spat an error about an alpha channel and there 
 
 # Spoiling Media
 
-There are times where you don't want the person in question to see the file you have sent right away on Discrd. Maybe its a picture of your sweet ride. This is where Spoiling comes in. The script will append "SPOILDER" to the prefix and allow you to send files automatically spoiled.
+There are times where you don't want the person in question to see the file you have sent right away on Discord. Maybe its a picture of your sweet ride. This is where Spoiling comes in. The script will append "SPOILER" to the prefix and allow you to send files automatically spoiled.
 
 # Errors
 
