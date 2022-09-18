@@ -1,6 +1,6 @@
 I have no idea how to use Github. Please forgive me.
 
-# IMPORTIANT
+# IMPORTANT
 
 Unless otherwise noted, the script will look for files in ***ALL*** subfolders. If you only want to work with a specific set of files, please put them in their own folder.
 
