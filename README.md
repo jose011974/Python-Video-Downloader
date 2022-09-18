@@ -139,6 +139,8 @@ Another reason why the script may fail is due to not having the proper permissio
 
 ## 3. Unable to Download Media
 
+---
+
 This script uses [Youtube-DL](https://github.com/ytdl-org/youtube-dl) for the actual downloading of the media. 
 
 The short version of how it works:
