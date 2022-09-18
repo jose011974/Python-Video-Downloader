@@ -154,8 +154,8 @@ If you are NOT able to access the link, its a feature.
 
 # Credits / License
 
-This scrpit was created in Visual Studio Code with Python 3.10.6
+This scrpit was created in Visual Studio Code with Python 3.10.4
 
 I only wish that you give me credit as the author if you decide to distribute my script.
 
-If there is anything that can be improved, please let me know. While I took a basic python course in high school back in 2016-2017, most of my programming skills are self taught through lots of trial and error. This script took 6 months of trial and error to get to where it is now.
+If there is anything that can be improved, please let me know. While I took a basic python course in high school back in 2016-2017, most of my programming skills are self taught through ***lots*** of trial and error. This script took 6 months to get to where it is now.
