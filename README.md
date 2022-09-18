@@ -160,9 +160,13 @@ If the script throws a 404 not found error, you can try to access the link in qu
 If you ARE able to access the link, then its a bug. Create an issue with the following information:
 
 * Python version
+
 * Dependency versions
+
 * OS type and version
+
 * URL that you tried to download
+
 * Error message
 
 If you are NOT able to access the link, its a feature.
