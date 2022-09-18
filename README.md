@@ -110,7 +110,7 @@ The errors are pretty self explaintory. If you think an error should not have oc
 * URL that you tried to download
 * Error message
 
-* Current Error Messages
+* [Current Error Messages](https://github.com/jose011974/Download-Compress-Media/blob/main/Error%20Codes.md)
 
 # Troubleshooting
 
