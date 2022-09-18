@@ -58,12 +58,13 @@ for p in packages:
 
 # Import the rest of the packages that range from changing text color to downloading videos.
 from colorama import Fore, Back, Style, init
+import fileinput
 import magic
 import moviepy.editor as mp
 import moviepy.video.fx.all as vfx
 import psutil
 import shutil
-import random
+import re
 import requests
 import time
 import validators
@@ -111,7 +112,7 @@ def convert(filename, fullFilePath, mediaPath):
         os.system(ffPath + ' -i "' + inputFile + '" -r 24 ' + codec + ' "' + outputFile + '"') # Windows
     else:
         os.system("ffmpeg" + ' -i "' + inputFile + '" -r 24 ' + codec + ' "' + outputFile + '"') # Linux / Other OS
-        try:
+        try: # Delete GIF file
             os.remove(oldFile)
         except:
             pass
@@ -122,7 +123,9 @@ def convert(filename, fullFilePath, mediaPath):
     if fileSize < 8192.00:
         return
     elif fileSize > 8192.00:
-        print(filename, "was unable to be compressed below 8MB. Please try another program / service.\n")
+        print("\n", filename, "was unable to be compressed below 8MB. Please try another program / service.\n")
+        print("Please press enter to continue")
+        input()
 
 
 
@@ -154,7 +157,7 @@ def createTempFolder(convPath, mediaPath):
             else:
                 boolVal = False
         
-        except PermissionError:# Uh oh.
+        except PermissionError: # Uh oh.
             clear()
             print(Back.RED + "Error: Missing required permissions. Please make sure you have read and write access to", end='')
             print(Back.MAGENTA + Fore.BLACK + mediaPath, "in order to create the neccessary folders.\n")
@@ -168,14 +171,18 @@ def createTempFolder(convPath, mediaPath):
             elif userInput == "n" or userInput == "menu":
                 return
 
-def errorHandler(error, uri):
+def errorHandler(origError, uri):
+    
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    error = ansi_escape.sub('', origError)
 
-    error = error[18:]
+    error = error[7:]
     # So I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
     # I strip out the trash and leave the error message behind, then I detect the error message and assign an error code.
 
     counter = -1
     errorNumber = -1
+    errorMessage = ""
 
     # Iterate over the error message
     for element in error:
@@ -183,29 +190,56 @@ def errorHandler(error, uri):
         if element == ";": 
             errorMessage = error[:counter]
             break
+
+    if errorMessage == "":
+        errorMessage = error
     
     # Check the error code and assign an error code to it
 
-    if errorMessage == "There's no video in this tweet.": 
+    if errorMessage == "There's no video in this tweet." or "Unable to extract video url": 
         errorNumber = 1
+    elif errorMessage == "Unsupported URL: " + uri:
+        errorNumber = 2
+    elif errorMessage == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>)":
+        errorNumber = 3
     else:
         errorNumber = 0
     
     if errorNumber == 0:
         clear()
 
-        print("An unknown error has occured. Please create an issue at [placeholder for github url] and include the URL and error message found below:\n")
+        print("An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+        print("include the URL and error message found below in your issue:\n")
+        print(uri, "\n")
         print(error)
     elif errorNumber == 1:
         clear()
 
-        print("A video source was not found. Unfortunatley, Youtube-DL does not have a method for downloading images. You will have to download them ")
-        print("manually. Here is the URL: \n")
-        print(uri)
-        print("\nPress enter to continue.")
+        print("Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
+        print("You can try right clicking the media and click 'Copy Video/Image Address'. Otherwise you will have to use the ", end='')
+        print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported.\n")
+        print("URL:", uri)
 
-        input()
+    elif errorNumber == 2:
+        clear()
 
+        print("Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
+        print("URL:", uri)
+
+    elif errorNumber == 3:
+        clear()
+
+        print("The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
+        print("URL:", uri)
+        
+    print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
+
+    userInput = input(">>")
+
+    if userInput.lower() == "suppress":
+        return "suppress"
+    
+    clear()
 
 def getFileExtension(filename):
 
@@ -300,9 +334,11 @@ def multipleFileConvert():
         break
 
 def multipleURLConvert():
+    eMessage = ""
     notFile = True
     mediaPath = os.getcwd()
     outputPath = str(Path(mediaPath + r'/output'))
+    UnhandledURLs = list()
         
     while notFile:
         clear()
@@ -320,7 +356,7 @@ def multipleURLConvert():
         if os.path.isfile(mediaPath + r'/' + "URL.txt"):
             URLPathList = list()
 
-            import fileinput
+            
             for line in fileinput.FileInput("URL.txt",inplace=1):
                 if line.rstrip():
                     URLPathList.append(line)
@@ -362,8 +398,15 @@ def multipleURLConvert():
                         os.replace(filename, filePath)
                         if not os.path.isdir(outputPath):
                             os.mkdir("output")
-                    except Exception as e:
-                        errorHandler(errorMessage, uri)
+                    except:
+                        if eMessage != "suppress":
+                            eMessage = errorHandler(errorMessage, uri)
+                        UnhandledURLs.append(uri + "\n")
+                        currentPos = currentPos+1
+
+                        clear()
+                        print(Back.RED + "ERROR: unable to download last URL, skipping.\n")
+
 
             # Check if there are any files over 8MB
             filePathList = getListOfFiles(mediaPath)
@@ -436,6 +479,17 @@ def multipleURLConvert():
                     counter = counter + 1
 
         clear()
+
+        UnhandledCount = len(UnhandledURLs)
+        if UnhandledCount > 0:
+
+            unsupportedURL = open("Unsupported URLs.txt", "w")
+            unsupportedURL.writelines(UnhandledURLs)
+            unsupportedURL.close()
+
+            print("There are some URLs that I was unable to access. They have been saved into a text file called 'Unsupported URLs.txt'. It is ", end='')
+            print("located in the same directory as the script.\n")
+        
         print("Operation(s) complete. The media files are located at:", Back.MAGENTA + Fore.WHITE + outputPath)
         print("\nPress enter to continue.")
 
@@ -448,8 +502,8 @@ def spoil():
 
     mediaPath = workingDirectory()
 
-    print("I will now append 'SPOILER' to the files in " + Back.MAGENTA + mediaPath + "\n")
-    print("Press enter to continue")
+    print("I will now append 'SPOILER' to the files in " + Back.MAGENTA + mediaPath)
+    print("\nPress enter to continue")
     input()
 
     filePathList = getListOfFiles(mediaPath)
@@ -566,9 +620,13 @@ def singleURLConvert():
             print("Downloading...\n")
             print("[Youtube-DL]")
 
-            # Download the media file
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([uri])
+            try:
+                # Download the media file
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([uri])
+            except:
+                errorHandler(errorMessage, uri)
+                return
 
             filename = downFileName.encode('ascii','ignore').decode('ascii')
             fileSize = getFileSize(filename)
@@ -743,8 +801,5 @@ def main():
 
 while True:
     clear()
-    try:
-        main()
-    finally:
-        pass
-        
+
+    main()
