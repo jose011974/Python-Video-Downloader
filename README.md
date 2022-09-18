@@ -24,9 +24,10 @@ Just in case something doesnt work, here are all of the libraries used in the sc
 
 *You shouldn't need to download these unless you installed Python wrong or something. These are already included with Python*
 
+* fileinput
 * os
 * platform
-* random
+* re
 * requests
 * shutil
 * time
@@ -40,7 +41,6 @@ Just in case something doesnt work, here are all of the libraries used in the sc
 * Colorama
 * magic
 * pathlib
-* PIL
 * psutil
 * validators
 * youtube_dl
