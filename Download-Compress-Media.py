@@ -354,12 +354,11 @@ def multipleURLConvert():
         if os.path.isfile(mediaPath + r'/' + "URL.txt"):
             URLPathList = list()
 
-            
             for line in fileinput.FileInput("URL.txt",inplace=1):
                 if line.rstrip():
                     URLPathList.append(line)
 
-            currentPos = 0
+            currentPos = 1
             largeFileCount = 0
             totalURLs = len(URLPathList)
 
@@ -369,8 +368,7 @@ def multipleURLConvert():
                 print("Press enter to return to the menu.\n")
                 input(">> ")
                 clear()
-                break
-                
+                break  
             
             # For each URL, download the media and determine if it needs compression
             for uriLine in URLPathList:
@@ -404,7 +402,6 @@ def multipleURLConvert():
 
                         clear()
                         print(Back.RED + "ERROR: unable to download last URL, skipping.\n")
-
 
             # Check if there are any files over 8MB
             filePathList = getListOfFiles(mediaPath)
@@ -586,6 +583,7 @@ def singleFileConvert():
             convert(filename, fullFilePath, filePath)
             clear()
             print("File was compressed successfully! It is located at", Back.MAGENTA + filePath + "/output/\n")
+            os.remove(fullFilePath)
         else:
             clear()
             print("The file did not need compression. Exiting...")
@@ -601,6 +599,8 @@ def singleURLConvert():
     notFile = True
 
     mediaPath = os.getcwd()
+    outputPath = str(Path(mediaPath + r'/output'))
+    tempPath = str(Path(mediaPath + r'/temp'))
         
     while notFile:
         clear()
@@ -622,16 +622,25 @@ def singleURLConvert():
                 # Download the media file
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
+
+                    filename = downFileName.encode('ascii','ignore').decode('ascii')
+                    tempFilePath = str(Path(tempPath + r'/' + filename))
+
+                    # Create a temp and output directory
+                    if not os.path.isdir(tempPath):
+                        os.mkdir(tempPath)
+                    os.replace(filename, tempFilePath)
+                    if not os.path.isdir(outputPath):
+                        os.mkdir("output")
             except:
                 errorHandler(errorMessage, uri)
                 return
 
-            filename = downFileName.encode('ascii','ignore').decode('ascii')
-            fileSize = getFileSize(filename)
-            fullFilePath = str(Path(mediaPath + r'/' + "output" + r'/' + filename))
+            fileSize = getFileSize(tempFilePath)
+            outputFullFilePath = str(Path(mediaPath + r'/' + "output" + r'/' + filename))
 
             if fileSize > 8192.00:
-                print("The media file has been sucessfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + fullFilePath + Style.RESET_ALL + "\n")
+                print("The media file has been sucessfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + Style.RESET_ALL + "\n")
                 print("If you do not have Discord Nitro (why would you), then you are unable to send the image to anyone ", end='')
                 print("unless you're in a server that has been boosted.) \n")
                 print("Do you wish to compress the media now? [y/n]\n")
@@ -640,16 +649,20 @@ def singleURLConvert():
                 print()
 
                 if userInput.lower() == "y":
-                    convert(filename, fullFilePath, mediaPath)
+                    convert(filename, tempFilePath, mediaPath)
+                    os.remove(tempFilePath)
+
                     clear()
-                    print("The media file has been sucessfully compressed and is located at", Back.MAGENTA + Fore.BLACK + fullFilePath + "\n")
+                    print("The media file has been sucessfully compressed and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
                     return
                 else:
+                    os.rename(tempFilePath, outputFullFilePath)
                     clear()
                     return
             else:
+                os.rename(tempFilePath, outputFullFilePath)
                 clear()
-                print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + fullFilePath + "\n")
+                print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
                 return
 
 def title():
@@ -755,8 +768,9 @@ def main():
         print("3. Single URL")
         print("4. Multiple URLs")
         print("5. Spoil media")
-        print("6. Help")
-        print("7. Exit\n")
+        print("6. Open Unsupported URLs")
+        print("7. Help")
+        print("8. Exit\n")
 
         try:
             userInput = int(input(">> "))
@@ -772,6 +786,38 @@ def main():
             elif userInput == 5:
                 spoil()
             elif userInput == 6:
+                counter = 1
+                clear()
+
+                print("I will now go ahead and open any unsupported links in 'Unsupported URLs.txt'. I will open them all at once, with ", end='')
+                print("a short pause in between just in case you have over 2000 URLs.\n")
+                print("If you want to stop the opening process, press CTRL and C on your keyboard at the same time.\n")
+                print("Press enter to continue.")
+                
+                input()
+
+                URLs = list()
+
+                for line in fileinput.FileInput("Unsupported URLs.txt",inplace=1):
+                    if line.rstrip():
+                        URLs.append(line)
+
+                if len(URLs) == 0:
+                    clear()
+
+                    print("There were no URLs detected.\n")
+                    print("Press enter to continue.")
+                    input()
+
+                for URL in URLs:
+                    clear()
+
+                    print("OPENING", counter, "OUT OF", len(URLs))
+                    webbrowser.open(URL, new=0, autoraise=False)
+                    time.sleep(0.4)
+                    counter = counter + 1
+
+            elif userInput == 7:
                 webbrowser.open("https://github.com/jose011974/Download-Compress-Media", new=1)
 
                 clear()
@@ -780,10 +826,12 @@ def main():
                 print("Press enter to continue.\n")
                 input()
 
-            elif userInput == 7:
+            elif userInput == 8:
                 clear()
-                print("\nExiting...\n")
+                print("Exiting...\n")
                 sys.exit()
+            
+            clear()
         except ValueError:
             clear()
             print("You have entered an invalid entry. Please try again.\n")
