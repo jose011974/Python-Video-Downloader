@@ -101,11 +101,13 @@ There are times where you don't want the person in question to see the file you 
 
 # Opening Unsupported URLs
 
-I'm not saying that someone will have over more than 1 unsupported URL, but in the event that it happens, I don't think you'd want to open each one manually.
+I'm not saying that someone will have more than 1 unsupported URL, but in the event that it happens, I don't think you'd want to open each one manually.
 
 So this option will open each URL with your default browser. I suggest you only have one window open and wait until the program is finished.
 
 **IF YOU HAVE MORE THAN AT LEAST 10 URLs, I SUGGEST YOU NOT USE THIS FEATURE UNLESS YOU HAVE THE MEMORY FOR IT. I AM NOT RESPONSIBLE FOR YOUR COMPUTER CRASHING WHEN YOU RUN OUT OF MEMORY**
+
+I will add a message that you must manually acknowledge in order to proceed. I think I will set the limit to 10 URLs at a time.
 
 # Errors
 
