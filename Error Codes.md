@@ -2,7 +2,7 @@
 
 These are custom error codes that I have created for my own script.
 
-If there is an error that is being shown, and you know for sure it shouln't be shown, please create an issue with the following information:
+If an error is occuring, and you know it shouldn't be, please create an issue with the following information:
 
 * Python version
 * Dependency versions
