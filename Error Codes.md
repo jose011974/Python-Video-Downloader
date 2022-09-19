@@ -30,7 +30,8 @@ ERROR CODES:
 
 PYTHON ERROR CODES:
 
-[Errno 75] Value too large for defined data type: 'URL.txt' -> 'URL.txt.bak' - This has only been triggered when the script does not have read/write permissions for URL.txt
+[Errno 75] Value too large for defined data type: 'URL.txt' -> 'URL.txt.bak' - The script does not have read/write permissions for the folder it is located in. Please ensure the script has the proper permissions before proceeding.
 
 TODO:
 
+NOTHING AT THE MOMENT
