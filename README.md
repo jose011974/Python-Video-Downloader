@@ -99,6 +99,14 @@ For PNG files, the script always spat an error about an alpha channel and there 
 
 There are times where you don't want the person in question to see the file you have sent right away on Discord. Maybe its a picture of your sweet ride. This is where Spoiling comes in. The script will append "SPOILER" to the prefix and allow you to send files automatically spoiled.
 
+# Opening Unsupported URLs
+
+I'm not saying that someone will have over more than 1 unsupported URL, but in the event that it happens, I don't think you'd want to open each one manually.
+
+So this option will open each URL with your default browser. I suggest you only have one window open and wait until the program is finished.
+
+**IF YOU HAVE MORE THAN AT LEAST 10 URLs, I SUGGEST YOU NOT USE THIS FEATURE UNLESS YOU HAVE THE MEMORY FOR IT. I AM NOT RESPONSIBLE FOR YOUR COMPUTER CRASHING WHEN YOU RUN OUT OF MEMORY**
+
 # Errors
 
 I have a basic error handing system in place. There are 4 error messages in place and more will be added as problems arise.
