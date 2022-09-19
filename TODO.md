@@ -4,6 +4,8 @@ These may or may not get implemented at all.
 
 Listed by priority, top being High and bottom being Low.
 
+---
+
 * Fix up the Readme
 * Add a message that the user must acknowledge if there are more than 10 URLs in Unsupported URLs.txt. They must acknowledge the message very 10 URL's opened to prevent the users RAM from being filled
 * Impliment a better system to download MOST media if Youtube-DL is unable to find a media source.
