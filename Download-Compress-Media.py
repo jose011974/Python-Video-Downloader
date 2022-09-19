@@ -206,14 +206,14 @@ def errorHandler(origError, uri):
     if errorNumber == 0:
         clear()
 
-        print("An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+        print("ERROR 0: An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
         print("include the URL and error message found below in your issue:\n")
         print(uri, "\n")
         print(error)
     elif errorNumber == 1:
         clear()
 
-        print("Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
+        print("ERROR 1: Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
         print("You can try right clicking the media and click 'Copy Video/Image Address'. Otherwise you will have to use the ", end='')
         print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported.\n")
         print("URL:", uri)
@@ -221,13 +221,13 @@ def errorHandler(origError, uri):
     elif errorNumber == 2:
         clear()
 
-        print("Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
+        print("ERROR 2: Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
         print("URL:", uri)
 
     elif errorNumber == 3:
         clear()
 
-        print("The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
+        print("ERROR 3: The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
         print("URL:", uri)
         
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
