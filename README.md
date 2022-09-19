@@ -107,7 +107,7 @@ So this option will open each URL with your default browser. I suggest you only 
 
 **IF YOU HAVE MORE THAN AT LEAST 10 URLs, I SUGGEST YOU NOT USE THIS FEATURE UNLESS YOU HAVE THE MEMORY FOR IT. I AM NOT RESPONSIBLE FOR YOUR COMPUTER CRASHING WHEN YOU RUN OUT OF MEMORY**
 
-I will add a message that you must manually acknowledge in order to proceed. I think I will set the limit to 10 URLs at a time.
+I will add a message that you must manually acknowledge in order to proceed.
 
 # Errors
 
