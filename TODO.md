@@ -5,5 +5,5 @@
 * Impliment a better system to download MOST media if Youtube-DL is unable to find a media source.
 * Impliment the blessing library to create better menus
 * Clean up the code if possible, maybe find better ways to execute processes
-* Possible create a Windows binary and a Linux AppImage or Package
+* Possibly create a Windows binary and a Linux AppImage or Package
   * As I don't expect many people to use this, I will only create a Windows x86-64 binary and a Linux AppImage & Deb Package. If there is interest in more distros I will make the packages available as I see fit. 
