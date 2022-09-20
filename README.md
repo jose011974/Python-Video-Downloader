@@ -1,5 +1,7 @@
 I have no idea how to use Github. Please forgive me.
 
+***There are still a few minor bugs***
+
 # IMPORTANT
 
 Unless otherwise noted, the script will look for files in ***ALL*** subfolders. If you only want to work with a specific set of files, please put them in their own folder.
