@@ -505,7 +505,7 @@ def spoil():
 
     for file in filePathList:
         ext = os.path.splitext(file)
-        os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file) + ext[1])
+        os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file))
         pass
 
     clear()
