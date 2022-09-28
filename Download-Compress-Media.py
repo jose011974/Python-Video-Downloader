@@ -75,6 +75,8 @@ init(autoreset=True) # Initialize colorama
 
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"]
 
+
+
 def clear():
     # Change the clear screen command based on OS.
     command = 'clear' # Unix
@@ -88,7 +90,7 @@ def convert(filename, fullFilePath, mediaPath):
     outputFile = str(Path(convPath + r'/' + filename))    # Output file
     oldFile = ""
 
-    createTempFolder(convPath, mediaPath)
+    createOutputFolder(mediaPath)
 
     clear()
 
@@ -144,13 +146,14 @@ def checkIfProcessRunning(processName):
             pass
     return False
 
-def createTempFolder(convPath, mediaPath):
+def createOutputFolder(mediaPath):
+    mediaPath = mediaPath + r'/output/'
     boolVal = True
     # Create the output folder
     while boolVal:
         try:
-            if not os.path.isdir(convPath):
-                os.mkdir(convPath)
+            if not os.path.isdir(mediaPath):
+                os.mkdir(mediaPath)
                 boolVal = False
             else:
                 boolVal = False
@@ -285,16 +288,15 @@ def getListOfFiles(dirName):
 def multipleFileConvert():
 
     notFile = True
-    mediaPath = workingDirectory()
-    convPath = str(Path(mediaPath + r'/output')) # Output path
-    createTempFolder(convPath, mediaPath)
+    mediaPath = str(Path(workingDirectory()))
+    createOutputFolder(mediaPath)
     
     if mediaPath == "menu":
         clear()
         return
         
     while notFile:
-        print("\nI will now attempt to find media files and compress them if required.\n")
+        print("I will now attempt to find media files and compress them if required.\n")
         print("Press enter to continue.\n")
 
         input()
@@ -318,7 +320,9 @@ def multipleFileConvert():
             if os.path.isfile(fullFilePath):
                 if getFileSize(fullFilePath) > 8192.00:
                         print("\nCompressing", Back.MAGENTA + filename, "-", getFileSize(fullFilePath), "MB - File", str(currentPos), "of", str(totalFiles) + "\n")
-                        convert(filename, fullFilePath, mediaPath)
+                        ffmpegInstalled = convert(filename, fullFilePath, mediaPath)
+                        if ffmpegInstalled == "no":
+                            return
                         os.remove(fullFilePath)
                 else:
                     os.replace(fullFilePath, convFile)
@@ -336,7 +340,11 @@ def multipleURLConvert():
     notFile = True
     mediaPath = os.getcwd()
     outputPath = str(Path(mediaPath + r'/output'))
+    tempPath = str(Path(mediaPath + r'/temp'))
     UnhandledURLs = list()
+    URLPathList = list()
+    largeFileCount = 0
+    currentPos = 0
         
     while notFile:
         clear()
@@ -352,14 +360,10 @@ def multipleURLConvert():
 
         # Open the URL.txt file and create a list of URL's
         if os.path.isfile(mediaPath + r'/' + "URL.txt"):
-            URLPathList = list()
-
             for line in fileinput.FileInput("URL.txt",inplace=1):
                 if line.rstrip():
                     URLPathList.append(line)
 
-            currentPos = 1
-            largeFileCount = 0
             totalURLs = len(URLPathList)
 
             if totalURLs == 0:
@@ -374,7 +378,7 @@ def multipleURLConvert():
             for uriLine in URLPathList:
                 uri = uriLine.rstrip()
                 if validators.url(uri):
-                    print("URI found:", uri, Back.MAGENTA + Fore.WHITE + "File " + str(currentPos) + r'/' + str(totalURLs - 1) + Style.RESET_ALL + "\n")
+                    print("URI found:", uri, Back.MAGENTA + Fore.WHITE + str(currentPos) + r'/' + str(totalURLs - 1) + Style.RESET_ALL + "\n")
                     print("Downloading...\n")
                     print("[Youtube-DL]")
 
@@ -384,7 +388,6 @@ def multipleURLConvert():
                             ydl.download([uri])
                         # Obtain the file paths for creating the temp and output folders
                         filename = downFileName.encode('ascii','ignore').decode('ascii')
-                        tempPath = str(Path(mediaPath + r'/temp'))
                         filePath = str(Path(tempPath + r'/' + filename))
                         currentPos = currentPos+1
 
@@ -756,6 +759,23 @@ ydl_opts = {
 }
 
 def main():
+
+    if platform.system() == "Windows":
+        ffPath = "C:/ffmpeg/ffmpeg.exe"
+        try:
+            if not os.path.isfile(ffPath):
+                clear()
+                print("You do not have ffmpeg installed, or it is corrupted. Please make sure it is installed in C:/ffmpeg/ffmpeg.exe\n")
+                print("Some features may be limited if you choose to proceed.\n")
+                print("Press enter to continue.")
+                input()
+        except:
+            clear()
+            print("You do not have ffmpeg installed, or it is corrupted. Please make sure it is installed in C:/ffmpeg/ffmpeg.exe\n")
+            print("Some features may be limited if you choose to proceed.\n")
+            print("Press enter to continue.")
+            input()
+
     while True:
 
         print("This script provides the ability to download and compress local/online media. Single and multiple file/URL modes are", end=' ')
