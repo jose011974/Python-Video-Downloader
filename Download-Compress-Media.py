@@ -829,6 +829,8 @@ def main():
                     print("Press enter to continue.")
                     input()
 
+                time.sleep(5)
+
                 for URL in URLs:
                     clear()
 
