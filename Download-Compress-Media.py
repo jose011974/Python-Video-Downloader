@@ -599,6 +599,7 @@ def singleFileConvert():
             print(e)
 
 def singleURLConvert():
+    clear()
     notFile = True
 
     mediaPath = os.getcwd()
@@ -606,12 +607,15 @@ def singleURLConvert():
     tempPath = str(Path(mediaPath + r'/temp'))
         
     while notFile:
-        clear()
         print("Please enter the URL of the media file to download and compress(optional): \n")
+        print("To return to the main menu, type 'menu'")
         print("Example: https://static1.e621.net/data/sample/89/85/8985342ea8ff4e4c4692f55e082aadb1.jpg\n")
 
         uri = input(">> ")
         print()
+
+        if uri.lower() == "menu" or uri.lower() == "exit":
+            return
 
         # Check if the URL is valid
         if not validators.url(uri):
@@ -663,10 +667,29 @@ def singleURLConvert():
                     clear()
                     return
             else:
-                os.rename(tempFilePath, outputFullFilePath)
-                clear()
-                print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
-                return
+                try:
+                    os.rename(tempFilePath, outputFullFilePath)
+                except FileExistsError:
+                    clear()
+
+                    print("A file with the name", os.path.basename(tempFilePath), "already exists. Would you like to overwrite it? (Y/N)\n")
+                    userInput = input(">> ")
+
+                    if userInput.lower() == "y":
+                        os.remove(outputFullFilePath)
+                        os.rename(tempFilePath, outputFullFilePath)
+                    elif userInput.lower() == "n":
+                        clear()
+                        print("The old file was not overwritten. Deleting temp data...")
+                        time.sleep(3)
+                        os.remove(tempFilePath)
+                        return
+                
+            clear()
+            print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
+            print("Returning to main menu in 5 seconds...")
+            time.sleep(5)
+            return
 
 def title():
 
