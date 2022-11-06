@@ -39,7 +39,7 @@ except subprocess.CalledProcessError:
         print()
         print("This updates your pip to a newer version according to this post: https://stackoverflow.com/a/69527217")
 
-packages = ["discord.py", "python-magic", "moviepy", "Pillow", "psutil", "validators", "wget", "youtube-dl"]
+packages = ["python-magic", "Pillow", "youtube-dl"]
 
 # Turns out the library needed for magic on Windows has been out of date since 2009. These are up to date and will work with Windows 10.
 if platform.system() == "Windows":
@@ -63,7 +63,6 @@ import magic
 import psutil
 import shutil
 import re
-import requests
 import time
 import validators
 import webbrowser
@@ -74,8 +73,6 @@ from pathlib import Path
 init(autoreset=True) # Initialize colorama
 
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"]
-
-
 
 def clear():
     # Change the clear screen command based on OS.
@@ -91,8 +88,6 @@ def convert(filename, fullFilePath, mediaPath):
     oldFile = ""
 
     createOutputFolder(mediaPath)
-
-    clear()
 
     ext = os.path.splitext(fullFilePath)
     codec = ""
@@ -338,7 +333,7 @@ def multipleFileConvert():
 def multipleURLConvert():
     eMessage = ""
     notFile = True
-    mediaPath = os.getcwd()
+    mediaPath = os.path.dirname(__file__)
     outputPath = str(Path(mediaPath + r'/output'))
     tempPath = str(Path(mediaPath + r'/temp'))
     UnhandledURLs = list()
@@ -347,6 +342,7 @@ def multipleURLConvert():
     currentPos = 0
         
     while notFile:
+
         clear()
         print("Please create a file called", Back.MAGENTA + Fore.WHITE + "URL.txt", "in", Back.MAGENTA + Fore.WHITE + mediaPath, "and add a URL to each line. Press enter when you are ready.\n")
         print("If you wish to return to the main menu, type 'menu'\n")
@@ -391,12 +387,7 @@ def multipleURLConvert():
                         filePath = str(Path(tempPath + r'/' + filename))
                         currentPos = currentPos+1
 
-                        # Create a temp and output directory
-                        if not os.path.isdir(tempPath):
-                            os.mkdir(tempPath)
-                        os.replace(filename, filePath)
-                        if not os.path.isdir(outputPath):
-                            os.mkdir("output")
+                        
                     except:
                         if eMessage != "suppress":
                             eMessage = errorHandler(errorMessage, uri)
@@ -464,12 +455,9 @@ def multipleURLConvert():
             except PermissionError: # Uh oh
                 if counter != 0:
                     clear()
-                    if checkIfProcessRunning('ffmpeg'):
-                        print('A stalled video conversion has been detected. Attempting to terminate...')
-                    else:
-                        print(Back.RED + Fore.White + "An error occured while removing/moving temporary files. Save any remaining files in the temp folder.\n")
-                        print("Press enter to continue.")
-                        input()
+                    print(Back.RED + Fore.White + "An error occured while removing/moving temporary files. Save any remaining files in the temp folder.\n")
+                    print("Press enter to continue.")
+                    input()
                     break
                 else:
                     print("Attempting to remove temporary files...")
@@ -495,21 +483,29 @@ def multipleURLConvert():
         clear()
         break
 
-def spoil():
+def spoil(option):
     clear()
 
     mediaPath = workingDirectory()
-
-    print("I will now append 'SPOILER' to the files in " + Back.MAGENTA + mediaPath)
-    print("\nPress enter to continue")
-    input()
-
     filePathList = getListOfFiles(mediaPath)
 
-    for file in filePathList:
-        ext = os.path.splitext(file)
-        os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file))
-        pass
+    if option == "spoil":
+        print("I will now append 'SPOILER' to the files in " + Back.MAGENTA + mediaPath)
+        print("\nPress enter to continue")
+        input()
+       
+        for file in filePathList:
+            os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file))
+            pass
+    elif option == "no spoil":
+        print("I will now remove 'SPOILER' from the files in " + Back.MAGENTA + mediaPath)
+        print("\nPress enter to continue")
+        input()
+
+        for file in filePathList:
+            newFileName = os.path.basename(file)
+            os.replace(file, mediaPath + r'/' + newFileName[8:])
+            pass
 
     clear()
 
@@ -522,7 +518,7 @@ def singleFileConvert():
     clear()
     notFile = True
 
-    currentDir = str(Path(os.getcwd()))
+    currentDir = str(Path(os.path.dirname(__file__)))
     fullFilePath = ""
     filename = ""
     filePath = ""
@@ -755,9 +751,7 @@ def downloadStatus(d):
     if d['status'] == 'finished': # Download status complete
         global downFileName
         origFileName = d['filename']
-
         print("\nDownloading complete.\n")
-
         downFileName = origFileName.encode('ascii','ignore').decode('ascii')
 
 # Logger for Youtube-DL
@@ -778,7 +772,7 @@ ydl_opts = {
     'outtmpl': f'%(id)s.%(ext)s',
     'restrictfilenames': True,
     'logger': MyLogger(),
-    'progress_hooks': [downloadStatus],
+    'progress_hooks': [downloadStatus], # See https://github.com/ytdl-org/youtube-dl/blob/5014bd67c22b421207b2650d4dc874b95b36dda1/youtube_dl/YoutubeDL.py#L235
 }
 
 def main():
@@ -810,10 +804,11 @@ def main():
         print("2. Multiple Files")
         print("3. Single URL")
         print("4. Multiple URLs")
-        print("5. Spoil media")
-        print("6. Open Unsupported URLs")
-        print("7. Help")
-        print("8. Exit\n")
+        print("5. Spoil Media")
+        print("6. No Spoil Media")
+        print("7. Open Unsupported URLs")
+        print("8. Help")
+        print("9. Exit\n")
 
         try:
             userInput = int(input(">> "))
@@ -827,21 +822,22 @@ def main():
             elif userInput == 4:
                 multipleURLConvert()
             elif userInput == 5:
-                spoil()
+                spoil("spoil")
             elif userInput == 6:
+                spoil("no spoil")
+            elif userInput == 7:
                 counter = 1
+                URLCounter = 0
                 clear()
 
-                print("I will now go ahead and open any unsupported links in 'Unsupported URLs.txt'. I will open them all at once, with ", end='')
-                print("a short pause in between just in case you have over 2000 URLs.\n")
-                print("If you want to stop the opening process, press CTRL and C on your keyboard at the same time.\n")
+                print("All of the URLs in 'Unsupported URLs.txt' will be opened 10 at a time.\n")
                 print("Press enter to continue.")
                 
                 input()
 
                 URLs = list()
 
-                for line in fileinput.FileInput("Unsupported URLs.txt",inplace=1):
+                for line in fileinput.FileInput(str(Path(os.path.dirname(__file__) + r'/Unsupported URLs.txt',inplace=1))):
                     if line.rstrip():
                         URLs.append(line)
 
@@ -852,17 +848,29 @@ def main():
                     print("Press enter to continue.")
                     input()
 
-                time.sleep(5)
+                while True:
+                    if counter == len(URLs) + 1:
+                        break
 
-                for URL in URLs:
-                    clear()
+                    for URL in URLs:
+                        clear()
 
-                    print("OPENING", counter, "OUT OF", len(URLs))
-                    webbrowser.open(URL, new=0, autoraise=False)
-                    time.sleep(0.4)
-                    counter = counter + 1
+                        print("OPENING", counter, "OUT OF", len(URLs))
+                        webbrowser.open(URL, new=0, autoraise=False)
+                        time.sleep(0.4)
+                        counter = counter + 1
+                        URLCounter = URLCounter + 1
 
-            elif userInput == 7:
+                    if URLCounter >= 10:
+                        clear()
+                        print("Opened 10 URLs. Press enter to continue.")
+                        input()
+                        URLCounter = 0
+                
+                clear()
+                print("Process complete. Press enter to continue.")
+
+            elif userInput == 8:
                 webbrowser.open("https://github.com/jose011974/Download-Compress-Media", new=1)
 
                 clear()
@@ -871,7 +879,7 @@ def main():
                 print("Press enter to continue.\n")
                 input()
 
-            elif userInput == 8:
+            elif userInput == 9:
                 clear()
                 print("Exiting...\n")
                 sys.exit()
@@ -884,5 +892,24 @@ def main():
 
 while True:
     clear()
+
+    # Creates required files and folders.
+    scriptPath = os.path.dirname(__file__)
+    URLTextPath = str(Path(scriptPath + r'/URLs.txt'))
+    UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
+    outputPath = str(Path(scriptPath + r'/output'))
+    tempPath = str(Path(scriptPath + r'/temp'))
+
+    if not os.path.exists(URLTextPath):
+        fp = open(URLTextPath, 'x')
+        fp.close()
+    if not os.path.exists(UnsuppURLPath):
+        fp = open(UnsuppURLPath, 'x')
+        fp.close()
+    if not os.path.exists(outputPath):
+        os.mkdir(outputPath)
+    if not os.path.exists(tempPath):
+        os.mkdir(tempPath)
+
 
     main()
