@@ -336,6 +336,7 @@ def multipleURLConvert():
     mediaPath = os.path.dirname(__file__)
     outputPath = str(Path(mediaPath + r'/output'))
     tempPath = str(Path(mediaPath + r'/temp'))
+    URLTextPath = str(Path(mediaPath + r'/URL.txt'))
     UnhandledURLs = list()
     URLPathList = list()
     largeFileCount = 0
@@ -355,8 +356,8 @@ def multipleURLConvert():
             return
 
         # Open the URL.txt file and create a list of URL's
-        if os.path.isfile(mediaPath + r'/' + "URL.txt"):
-            for line in fileinput.FileInput("URL.txt",inplace=1):
+        if os.path.isfile(URLTextPath):
+            for line in fileinput.FileInput(URLTextPath,inplace=1):
                 if line.rstrip():
                     URLPathList.append(line)
 
@@ -385,9 +386,9 @@ def multipleURLConvert():
                         # Obtain the file paths for creating the temp and output folders
                         filename = downFileName.encode('ascii','ignore').decode('ascii')
                         filePath = str(Path(tempPath + r'/' + filename))
+                        os.rename(downFileName, filePath)
                         currentPos = currentPos+1
 
-                        
                     except:
                         if eMessage != "suppress":
                             eMessage = errorHandler(errorMessage, uri)
@@ -911,5 +912,6 @@ while True:
     if not os.path.exists(tempPath):
         os.mkdir(tempPath)
 
+    os.chdir(os.path.dirname(__file__))
 
     main()
