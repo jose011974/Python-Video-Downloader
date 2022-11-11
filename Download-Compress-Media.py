@@ -39,7 +39,7 @@ except subprocess.CalledProcessError:
         print()
         print("This updates your pip to a newer version according to this post: https://stackoverflow.com/a/69527217")
 
-packages = ["python-magic", "Pillow", "youtube-dl"]
+packages = ["colorama", "psutil", "python-magic", "Pillow", "validators", "youtube-dl"]
 
 # Turns out the library needed for magic on Windows has been out of date since 2009. These are up to date and will work with Windows 10.
 if platform.system() == "Windows":
@@ -694,7 +694,7 @@ def title():
 
     title = "[MediaConverter.py v1.0 - Download and compress media]"
     consoleSize = shutil.get_terminal_size()
-    col, row = int(consoleSize[0])-len(title), int(consoleSize[1])
+    col = int(consoleSize[0])-len(title)
 
     for x in range(0, int(col/2)):
         print("-", end = '')
