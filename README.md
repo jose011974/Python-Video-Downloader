@@ -1,8 +1,8 @@
-ur mom
+# **THIS BRANCH IS FOR RE-WRITING THE SCRIPT USING THE BLESSED LIBRARY. THIS VERSION IS ALSO THE MOST UP TO DATE.**
 
 I have no idea how to use Github. Please forgive me.
 
-***There are still a few minor bugs***
+***There are still a few ~~minor~~ **MAJOR** bugs***
 
 # IMPORTANT
 
