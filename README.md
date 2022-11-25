@@ -1,3 +1,5 @@
+ur mom
+
 I have no idea how to use Github. Please forgive me.
 
 ***There are still a few minor bugs***
