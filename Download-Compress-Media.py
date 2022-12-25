@@ -128,7 +128,6 @@ def convert(filename, fullFilePath, mediaPath):
         input()
 
 
-
 def checkIfProcessRunning(processName):
     # For whatever reason, sometimes a video conversion process is stalled. This function kills any and all ffmpeg processes as you cannot move a file
     # that is in use by a process.
