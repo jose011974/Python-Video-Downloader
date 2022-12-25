@@ -143,6 +143,84 @@ def countdown():
         time.sleep(1)
         i = i - 1
 
+def countStrings(text):
+    num = 0
+    res = char.str_len(text)
+    for ele in res:
+        num = num + ele
+
+    return num
+
+def errorHandler(origError, uri):
+    
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    error = ansi_escape.sub('', origError)
+
+    error = error[7:]
+    # So I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
+    # I strip out the trash and leave the error message behind, then I detect the error message and assign an error code.
+
+    counter = -1
+    errorNumber = -1
+    errorMessage = ""
+
+    # Iterate over the error message
+    for element in error:
+        counter = counter + 1
+        if element == ";": 
+            errorMessage = error[:counter]
+            break
+
+    if errorMessage == "":
+        errorMessage = error
+    
+    # Check the error code and assign an error code to it
+
+    if errorMessage == "There's no video in this tweet." or "Unable to extract video url": 
+        errorNumber = 1
+    elif errorMessage == "Unsupported URL: " + uri:
+        errorNumber = 2
+    elif errorMessage == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>)":
+        errorNumber = 3
+    else:
+        errorNumber = 0
+    
+    if errorNumber == 0:
+        clear()
+
+        print("ERROR 0: An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+        print("include the URL and error message found below in your issue:\n")
+        print(uri, "\n")
+        print(error)
+    elif errorNumber == 1:
+        clear()
+
+        print("ERROR 1: Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
+        print("You can try right clicking the media and click 'Copy Video/Image Address'. Otherwise you will have to use the ", end='')
+        print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported.\n")
+        print("URL:", uri)
+
+    elif errorNumber == 2:
+        clear()
+
+        print("ERROR 2: Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
+        print("URL:", uri)
+
+    elif errorNumber == 3:
+        clear()
+
+        print("ERROR 3: The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
+        print("URL:", uri)
+        
+    print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
+
+    userInput = input(">>")
+
+    if userInput.lower() == "suppress":
+        return "suppress"
+    
+    clear()
+
 def getFileExtension(filename):
 
     fileMIME = magic.from_file(filename, mime=True) # Identify the file type
@@ -355,6 +433,12 @@ def multipleFileConvert():
         clear()
         break
 
+
+
+
+
+
+
 def singleFileConvert():
     clear()
     notLoaded = True
@@ -461,6 +545,95 @@ def singleFileConvert():
             pass
         else:
             print(e)
+def singleURLConvert():
+    clear()
+    notFile = True
+
+    mediaPath = os.path.dirname(__file__)
+    outputPath = str(Path(mediaPath + r'/output'))
+    
+        
+    while notFile:
+        url = "https://static1.e621.net/data/sample/89/85/8985342ea8ff4e4c4692f55e082aadb1.jpg"
+        print(
+            "Please enter a URL, then press enter.\n\nTo return to the main menu, type 'menu', then press enter.\n\n" +
+            "Example URL:", term.link(url, url), "\n" + term.move_right(13) + "(CTRL click to open)", end='\n\n'
+            )
+
+        uri = input(">> ")
+        print()
+
+        if uri.lower() == "menu":
+            return
+
+        # Check if the URL is valid
+        if not validators.url(uri):
+            clear()
+            print(term.brown1 + "The URL is not valid. Please check the syntax and try again.", term.normal, end='\n\n')
+        else:
+            clear()
+            text = ["URI found:", uri, "| Downloading...", "[Youtube-DL]"]
+            num = countStrings(text)
+            print(term.move_xy(int(W/2 - num/2), int(H/2)), text[0], term.cadetblue1 + text[1], term.normal + text[2], "\n\n" + text[3])
+
+            try:
+                # Download the media file
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([uri])
+
+                    filename = downFileName.encode('ascii','ignore').decode('ascii')
+                    outFile = str(Path(outputPath + r'/' + filename))
+
+                    # Create an output directory
+                    if not os.path.isdir(outputPath):
+                        os.mkdir("output")
+            except:
+                errorHandler(errorMessage, uri)
+                return
+
+            fileSize = getFileSize(filename)
+
+            if fileSize > 8192.00:
+                text = "Download complete. Do you wish to compress the media? (y/n)"
+                print(term.move_xy(int(W/2 - len(text)/2), int(H/2 - 2)) + text, end='\n\n')
+
+                userInput = input(">> ")
+
+                if userInput.lower() == "y":
+                    convert(filename, tempFilePath, mediaPath)
+                    os.remove(tempFilePath)
+
+                    clear()
+                    print("The media file has been sucessfully compressed and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
+                    return
+                else:
+                    os.rename(tempFilePath, outputFullFilePath)
+                    clear()
+                    return
+            else:
+                try:
+                    os.rename(tempFilePath, outputFullFilePath)
+                except FileExistsError:
+                    clear()
+
+                    print("A file with the name", os.path.basename(tempFilePath), "already exists. Would you like to overwrite it? (Y/N)\n")
+                    userInput = input(">> ")
+
+                    if userInput.lower() == "y":
+                        os.remove(outputFullFilePath)
+                        os.rename(tempFilePath, outputFullFilePath)
+                    elif userInput.lower() == "n":
+                        clear()
+                        print("The old file was not overwritten. Deleting temp data...")
+                        time.sleep(3)
+                        os.remove(tempFilePath)
+                        return
+                
+            clear()
+            print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
+            print("Returning to main menu in 5 seconds...")
+            time.sleep(5)
+            return
 
 def title():
 
@@ -545,15 +718,19 @@ def workingDirectory():
     # Sets the directory to where media is located for multi-file operations
     clear()
     while True:
-        currentDir = str(Path(os.path.dirname(__file__))) # Get the running directory
+        currentDir = str(Path(os.path.dirname(__file__)))
+        text = "(CTRL click to open the path)"
 
         print("Please enter the directory that contains the media you wish to convert:\n")
         print("To return to the main menu, type 'menu'\n")
-        print("Current directory:", term.cadetblue1 + currentDir + "\n" + term.normal)
+        print(
+            "Current directory:", term.cadetblue1 + term.link(currentDir, currentDir) + "\n" + term.normal +
+             term.move_x(0) + term.move_right(19) + text, end='\n\n'
+        )
 
         newDirectory = input(">> ")
 
-        if newDirectory.lower() == "menu" or newDirectory.lower == "exit":
+        if newDirectory.lower() == "menu":
             return "menu"
         else:
             newDirectory = str(Path(newDirectory)) # Change the media directory to the user specified directory
@@ -561,7 +738,7 @@ def workingDirectory():
         if os.path.isdir(newDirectory):
             # Double triple check the user specified directory is correct
             clear()
-            print("You have entered", term.cadetblue1 + newDirectory, term.normal + "Is this correct? [y/n]\n")
+            print("You have entered", term.cadetblue1 + term.link(newDirectory, newDirectory), term.normal + "Is this correct? [y/n]\n")
             print("To return to the main menu, type 'menu'\n")
 
             userInput = input(">> ")
@@ -583,6 +760,36 @@ def workingDirectory():
             clear()
             print(term.brown1 + "You have entered an invalid path. Please try again.\n" + term.normal)
 
+# Logger for Youtube-DL
+class MyLogger(object):
+    def debug(self, msg):
+        print(msg)
+
+    def warning(self, msg):
+        print(msg)
+
+    def error(self, msg):
+        global errorMessage
+        errorMessage = msg
+
+def downloadStatus(d):
+    if d['status'] == 'finished': # Download status complete
+        global downFileName
+        origFileName = d['filename']
+
+        print("\nDownloading complete.\n")
+        downFileName = origFileName.encode('ascii','ignore').decode('ascii')
+
+
+# Parameters for Youtube-DL.
+# See https://github.com/ytdl-org/youtube-dl/blob/5014bd67c22b421207b2650d4dc874b95b36dda1/youtube_dl/YoutubeDL.py#L141
+ydl_opts = {
+    'outtmpl': f'%(id)s.%(ext)s',
+    'restrictfilenames': True,
+    'logger': MyLogger(),
+    'progress_hooks': [downloadStatus],
+}
+
 # ---------------------------------
 
 import distro
@@ -593,6 +800,7 @@ import youtube_dl
 import blessed
 import datetime
 
+from numpy import char
 from PIL import Image
 
 debug = 1
