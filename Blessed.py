@@ -16,14 +16,14 @@ from pathlib import Path
 
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"]
 
-def createOutputFolder(mediaPath):
-    mediaPath = str(Path(mediaPath + r'/output/'))
+def createOutputFolder(currentDir):
+    outputDir = str(Path(currentDir + r'/output'))
     boolVal = True
     # Create the output folder
     while boolVal:
         try:
-            if not os.path.isdir(mediaPath):
-                os.mkdir(mediaPath)
+            if not os.path.isdir(outputDir):
+                os.mkdir(outputDir)
                 boolVal = False
             else:
                 boolVal = False
@@ -31,14 +31,16 @@ def createOutputFolder(mediaPath):
         except PermissionError:
             clear()
             print(term.brown1 + "Error: Missing required permissions. Please make sure you have read and write access to" + term.normal +
-            term.cadetblue1 + mediaPath, + term.normal + "in order to create the neccessary folders.\n To try again, type y. If you would" +
+            term.cadetblue1 + currentDir, + term.normal + "in order to create the neccessary folders.\n To try again, type y. If you would" +
             "rather instead use the path the script is located at, type 'n'.\nTo return to the main menu, type 'menu'\n")
 
             userInput = input(">> ")
 
             if userInput == "y":
                 continue
-            elif userInput == "n" or userInput == "menu":
+            elif userInput == "n":
+                return
+            elif userInput == "menu":
                 return
 
 def clear():
@@ -67,7 +69,6 @@ def configuration():
         URLTextPath = str(Path(scriptPath + r'/URLs.txt'))
         UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
         outputPath = str(Path(scriptPath + r'/output'))
-        tempPath = str(Path(scriptPath + r'/temp'))
 
         if not os.path.exists(URLTextPath):
             fp = open(URLTextPath, 'x')
@@ -77,8 +78,6 @@ def configuration():
             fp.close()
         if not os.path.exists(outputPath):
             os.mkdir(outputPath)
-        if not os.path.exists(tempPath):
-            os.mkdir(tempPath)
 
         os.chdir(os.path.dirname(__file__))
 
@@ -97,23 +96,20 @@ def configuration():
                 input()
         main()
 
-def convert(filename, fullFilePath, mediaPath):
-    convPath = str(Path(mediaPath + r'/output')) # Output path
+def convert(filename, filenamePath):
+    convPath = str(Path(filenamePath + r'/output')) # Output path
     outputFile = str(Path(convPath + r'/' + filename))    # Output file
-    inputFile = str(Path(fullFilePath))
-    outputFile = str(Path(outputFile))
-    ext = os.path.splitext(fullFilePath)
+    inputFile = filenamePath # Input File
+    ext = os.path.splitext(inputFile) # Extension
     codec = ""
     
     now = datetime.datetime.now()
     text = "Time the Process started: " + now.strftime('%I:%M %p')
     print(term.move_xy(int(W/2 - len(text)/2), int(H/2 + 4)) + text + "\n")
 
-    createOutputFolder(mediaPath)
-
     if ext[1] == ".gif" or ext[1] == ".webm" or ext[1] == ".mp4":
         # Setup paths and codec options
-        outputFile = convPath + r'/' + os.path.basename(ext[0]) + ".mp4"
+        outputFile = str(Path(convPath + r'/' + os.path.basename(ext[0]) + ".mp4"))
         codec = "-c:v libx264 -crf 28 -pix_fmt yuv420p"
 
         # Begin Conversion
@@ -132,12 +128,11 @@ def convert(filename, fullFilePath, mediaPath):
 
     return outputFile
 
-def countdown():
+def countdown(i):
     curLocation = term.get_location()
     W = curLocation[1]
     H = curLocation[0]
 
-    i = 3
     while i >= 0:
         print(term.move_xy(W + 1,H) + "(" + str(i) + ")")
         time.sleep(1)
@@ -369,7 +364,6 @@ def main():
             continue
 
 def multipleFileConvert():
-
     notFile = True
     mediaPath = str(Path(workingDirectory()))
     
@@ -393,7 +387,7 @@ def multipleFileConvert():
         textLength = len(text) + len(str(totalFiles)) + len(text2)
         print(term.move_xy(int(W/2 - textLength/2), int(H/2)) + text + term.cadetblue1 + str(totalFiles) + term.normal + text2, end='')
 
-        countdown()
+        countdown(3)
         clear()
 
         # Iterate through the files in filePathList and determine if they need compression
@@ -401,6 +395,7 @@ def multipleFileConvert():
             currentPos = currentPos+1
             fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
             filename = os.path.basename(fullFilePath)
+            filePath = os.path.dirname(fullFilePath)
             convFile = str(Path(mediaPath + r'/output/' + filename)) # Output file path
 
             if os.path.isfile(fullFilePath):
@@ -410,13 +405,13 @@ def multipleFileConvert():
                         print(term.move_xy(int(W/2 - (len(text) + len(filename) + len(text2))/2), int(H/2 - 2)) + text + 
                         term.cadetblue1 + filename + term.normal + text2)
                         # print("\nCompressing " + term.cadetblue1 + filename + term.normal + " | " + str(getFileSize(fullFilePath)) + " MB | File " + str(currentPos) + " of " + str(totalFiles) + "\n")
-                        convert(filename, fullFilePath, mediaPath)
+                        convert(filename, filePath)
                 else:
                     shutil.copy(fullFilePath, convFile)
         
         clear()      
-        text = "Procedure complete. The files is located at:"
-        path = os.path.dirname(fullFilePath)
+        text = "Procedure complete. The files are located at:"
+        path = os.path.dirname(convFile)
         text2 = "Note: The files may still be large. If that is the case, segment the files or use a different program/service."
         text3 = "Please press Enter to continue."
 
@@ -426,24 +421,18 @@ def multipleFileConvert():
             term.move_xy(int(W/2 - len(text2)/2), int(H/2 + 2)) + text2, end=''
             )
 
-        countdown()
+        countdown(5)
         print(term.move_xy(int(W/2 - len(text3)/2), int(H/2 + 4)) + text3, end='')
         input()
 
         clear()
         break
 
-
-
-
-
-
-
 def singleFileConvert():
     clear()
     notLoaded = True
 
-    currentDir = str(Path(os.getcwd()))
+    currentDir = os.getcwd()
     fullFilePath = ""
     filename = ""
     filePath = ""
@@ -459,7 +448,7 @@ def singleFileConvert():
 
         userInput = input(">> ").encode('ascii','ignore').decode('ascii')
 
-        if userInput.lower() == "menu" or userInput.lower() == "exit":
+        if userInput.lower() == "menu":
             exitStatus = 1
             break
         
@@ -469,10 +458,13 @@ def singleFileConvert():
                 filename = userInput
                 filePath = currentDir
                 fullFilePath = str(Path(currentDir + r'/' + filename))
+                outputDir = str(Path(currentDir + r'/output'))
             else: # Full path was entered
                 filename = os.path.basename(userInput) 
                 filePath = os.path.dirname(userInput)
-                fullFilePath = str(Path(filePath + r'/' + filename))
+                fullFilePath = str(Path(userInput))
+                outputDir = str(Path(filePath + r'/output'))
+                outputFile = str(Path(filePath + r'/output/' + filename))
 
             if os.path.isfile(fullFilePath):
                 notLoaded = False
@@ -505,42 +497,28 @@ def singleFileConvert():
         # Determine if the media file needs compression
         if getFileSize(fullFilePath) > 8192.00:
             clear()
+            text = "Compressing"
+            print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
+            convert(filename, filePath)
 
-            text = "The file: "
-            text2 = " was found. Processing...\n\n"
-            textLength = len(text) + len(filename) + len(text2) + 21
-            
-            print(
-                term.move_xy(int(W/2 - textLength/2), int(H/2 - 2)) + text + term.cadetblue1 + term.link(fullFilePath, filename) + term.normal +
-                " (CTRL click to open)" + text2, end=''
-                )
-            outputFile = convert(filename, fullFilePath, filePath)
             clear()
-            
-            text = "Procedure complete. The file is located at:"
-            path = os.path.dirname(outputFile)
-            text2 = "Note: The file may still be large. If that is the case, segment the file or use a different program/service."
-            text3 = "Please press Enter to continue."
-
+            text = ["The media file has been sucessfully compressed and is located at", "Returning to the main menu in"]
             print(
-                term.move_xy(int(W/2 - len(text)/2), int(H/2 - 2)) + text +
-                term.cadetblue1 + term.move_xy(int(W/2 - (len(path) + 21)/2), int(H/2)) + term.link(path, path) + term.normal + " (CTRL click to open)" +
-                term.move_xy(int(W/2 - len(text2)/2), int(H/2 + 2)) + text2, end=''
-                )
-
-            countdown()
-
-            print(term.move_xy(int(W/2 - len(text3)/2), int(H/2 + 4)) + text3, end='')
-
-            input()
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0], 
+                term.move_xy(int(W/2 - len(outputDir)/2), int(H/2 )), term.bluecadet1 + outputDir, term.normal, "\n",
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
+            )
+            countdown(5)
+            os.rename(fullFilePath, str(Path(outputDir + r'/OLD_' + filename)))
 
         elif exitStatus == 0:
             clear()
-            text = "The file did not need to be compressed. Exiting..."
+            text = "The file did not need to be compressed. Returning to the main menu in"
             print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='')
-            countdown()
+            countdown(3)
+            os.rename(fullFilePath, outputFile)
     except Exception as e:
-        if userInput.lower() == "menu" or userInput.lower() == "exit":
+        if userInput.lower() == "menu":
             clear()
             pass
         else:
@@ -581,7 +559,8 @@ def singleURLConvert():
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
 
-                    filename = downFileName.encode('ascii','ignore').decode('ascii')
+                    filenamePath = str(Path(mediaPath + r'/' + downFileName.encode('ascii','ignore').decode('ascii')))
+                    filename = os.path.basename(filenamePath)
                     outFile = str(Path(outputPath + r'/' + filename))
 
                     # Create an output directory
@@ -591,48 +570,63 @@ def singleURLConvert():
                 errorHandler(errorMessage, uri)
                 return
 
-            fileSize = getFileSize(filename)
+            fileSize = getFileSize(filenamePath)
 
             if fileSize > 8192.00:
+                clear()
                 text = "Download complete. Do you wish to compress the media? (y/n)"
-                print(term.move_xy(int(W/2 - len(text)/2), int(H/2 - 2)) + text, end='\n\n')
+                print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='\n\n')
 
                 userInput = input(">> ")
 
                 if userInput.lower() == "y":
-                    convert(filename, tempFilePath, mediaPath)
-                    os.remove(tempFilePath)
+                    clear()
+                    text = "Compressing"
+                    print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
+                    convert(filename, filenamePath)
 
                     clear()
-                    print("The media file has been sucessfully compressed and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
+                    text = ["The media file has been sucessfully compressed and is located at", "Returning to the main menu in"]
+                    print(
+                        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0], 
+                        term.move_xy(int(W/2 - len(outFile)/2), int(H/2 )), term.cadetblue1 + outFile, term.normal, "\n",
+                        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
+                    )
+
+                    countdown(5)
                     return
                 else:
-                    os.rename(tempFilePath, outputFullFilePath)
                     clear()
                     return
             else:
                 try:
-                    os.rename(tempFilePath, outputFullFilePath)
+                    os.rename(filenamePath, outFile)
                 except FileExistsError:
                     clear()
 
-                    print("A file with the name", os.path.basename(tempFilePath), "already exists. Would you like to overwrite it? (Y/N)\n")
+                    text = ["A file with the name", "already exists. Would you like to overwrite it? (Y/N)\n"]
+                    textLength = countStrings(text) + len(filename)
+                    
+                    print(term.move_xy(int(W/2 - textLength/2), int(H/2)) + text[0], term.cadetblue1, filename, term.normal, text[1], end='\n\n')
                     userInput = input(">> ")
 
                     if userInput.lower() == "y":
-                        os.remove(outputFullFilePath)
-                        os.rename(tempFilePath, outputFullFilePath)
+                        shutil.copy(filenamePath, outFile)
                     elif userInput.lower() == "n":
                         clear()
-                        print("The old file was not overwritten. Deleting temp data...")
-                        time.sleep(3)
-                        os.remove(tempFilePath)
                         return
                 
             clear()
-            print("Media successfully downloaded and is located at", Back.MAGENTA + Fore.BLACK + outputFullFilePath + "\n")
-            print("Returning to main menu in 5 seconds...")
-            time.sleep(5)
+
+            text = ["Media successfully downloaded and is located at", "Returning to main menu in"]
+
+            print(
+                term.move_xy(int(W/2 - 47/2), int(H/2 - 2)) + text[0] + "\n\n", 
+                term.move_xy(int(W/2 - len(outputPath)/2), int(H/2)) + term.cadetblue1, outputPath, term.normal, 
+                term.move_xy(int(W/2 - 38/2), int(H/2 + 2)) + text[1], end=''
+                )
+            
+            countdown(5)
             return
 
 def title():
@@ -755,6 +749,7 @@ def workingDirectory():
             else:
                 clear()
                 print("Source media location changed to:", term.cadetblue1 + newDirectory + "\n" + term.normal)
+                createOutputFolder(newDirectory)
                 return newDirectory
         else:
             clear()
