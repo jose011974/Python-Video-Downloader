@@ -2,6 +2,10 @@ I have no idea how to use Github. Please forgive me.
 
 ***There are still a few minor bugs***
 
+***USE AT YOUR OWN RISK. I AM NOT RESPONSIBLE FOR ANY DATA LOSS CAUSED BY YOUR NEGLIGENCE.***
+
+You should use this script instead of the one in the Reworked branch. This one is the most stable.
+
 # IMPORTANT
 
 Unless otherwise noted, the script will look for files in ***ALL*** subfolders. If you only want to work with a specific set of files, please put them in their own folder.
