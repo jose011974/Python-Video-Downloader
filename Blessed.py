@@ -55,8 +55,8 @@ def configuration():
     updateDependencies()
 
     global term
-    term = blessed.Terminal()
     global W,H
+    term = blessed.Terminal()
     W,H = term.width, term.height
     distroID = distro.name(pretty=True)
     distroID = "Linux Version: " + distroID
@@ -66,9 +66,10 @@ def configuration():
 
         # Creates required files and folders.
         scriptPath = os.path.dirname(__file__)
-        URLTextPath = str(Path(scriptPath + r'/URLs.txt'))
-        UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
+        URLTextPath = str(Path(scriptPath + r'/URL.txt'))
+        UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URL.txt'))
         outputPath = str(Path(scriptPath + r'/output'))
+        tempPath = str(Path(scriptPath + r'/temp'))
 
         if not os.path.exists(URLTextPath):
             fp = open(URLTextPath, 'x')
@@ -78,6 +79,8 @@ def configuration():
             fp.close()
         if not os.path.exists(outputPath):
             os.mkdir(outputPath)
+        if not os.path.exists(tempPath):
+            os.mkdir(tempPath)
 
         os.chdir(os.path.dirname(__file__))
 
@@ -96,11 +99,29 @@ def configuration():
                 input()
         main()
 
+def checkIfProcessRunning(processName):
+    # For whatever reason, sometimes a video conversion process is stalled. This function kills any and all ffmpeg processes as you cannot move a file
+    # that is in use by a process.
+
+    # Iterate over the all the running process
+    for proc in psutil.process_iter():
+        try:
+            # Check if process name contains the given name string.
+            if processName.lower() in proc.name().lower():
+                # Expire the process.
+                p = psutil.Process(proc.pid)
+                p.terminate()
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess): # Uh oh.
+            pass
+    return False
+
 def convert(filename, filenamePath):
-    convPath = str(Path(filenamePath + r'/output')) # Output path
-    outputFile = str(Path(convPath + r'/' + filename))    # Output file
-    inputFile = filenamePath # Input File
-    ext = os.path.splitext(inputFile) # Extension
+    outputPath = str(Path(filenamePath + r'/output')) # Output path
+    outputFile = str(Path(outputPath + r'/' + filename))    # Output file
+    fullFilePath = str(Path(filenamePath + r'/' + filename))
+    inputFile = fullFilePath # Input File
+    ext = os.path.splitext(filename) # Extension
     codec = ""
     
     now = datetime.datetime.now()
@@ -109,7 +130,7 @@ def convert(filename, filenamePath):
 
     if ext[1] == ".gif" or ext[1] == ".webm" or ext[1] == ".mp4":
         # Setup paths and codec options
-        outputFile = str(Path(convPath + r'/' + os.path.basename(ext[0]) + ".mp4"))
+        outputFile = str(Path(outputPath + r'/' + os.path.basename(ext[0]) + ".mp4"))
         codec = "-c:v libx264 -crf 28 -pix_fmt yuv420p"
 
         # Begin Conversion
@@ -152,7 +173,7 @@ def errorHandler(origError, uri):
     error = ansi_escape.sub('', origError)
 
     error = error[7:]
-    # So I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
+    # I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
     # I strip out the trash and leave the error message behind, then I detect the error message and assign an error code.
 
     counter = -1
@@ -428,6 +449,191 @@ def multipleFileConvert():
         clear()
         break
 
+def multipleURLConvert():
+    eMessage = ""
+    notFile = True
+    mediaPath = os.getcwd()
+    outputPath = str(Path(mediaPath + r'/output'))
+    tempPath = str(Path(mediaPath + r'/temp'))
+    UnhandledURLs = list()
+    URIList = list()
+    largeFileCount = 0
+    currentPos = 0
+        
+    while notFile:
+        clear()
+        text = ["Please create a file called", "URL.txt",  "at", "and insert a URL at each line. Press enter when you are ready.", 
+        "To return to the main menu, type 'menu'"]
+
+        print(
+            term.move_xy(int(W/2 - 38/2), int(H/2 - 2)) + text[0],
+            term.cadetblue1 + text[1] + term.normal,
+            text[2],
+            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal,
+            term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 2)) + text[3],
+            term.move_xy(int(W/2 - len(text[4])/2), int(H/2 + 4)) + text[4] + "\n\n"
+            )
+
+        userInput = input("")
+        print()
+
+        if userInput.lower() == "menu":
+            return
+
+        # Open the URL.txt file and create a list of URL's
+        if os.path.isfile(mediaPath + r'/' + "URL.txt"):
+            for line in fileinput.FileInput("URL.txt",inplace=1):
+                if line.rstrip():
+                    URIList.append(line)
+
+            totalURLs = len(URIList)
+
+            if totalURLs == 0:
+                clear()
+
+                text = ["There were no URL's found in", "URL.txt.", "Please make sure that there are URL's and that you have read/write permissions " +
+                "set correctly.", "Press enter to return to the menu."]
+                
+                print(
+                    term.move_xy(int(W/2 - 130/2), int(H/2 - 1)) + text[0],
+                    term.cadetblue1 + text[1] + term.normal,
+                    text[2],
+                    term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 1)) + text[3]
+                    )
+
+                input("")
+                break  
+            
+            # For each URL, download the media and determine if it needs compression
+            for uriLine in URIList:
+                uri = uriLine.rstrip()
+                if validators.url(uri):
+                    text = ["URI Found:", "[Youtube-DL]"]
+                    
+                    clear()
+                    print(
+                        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+                        term.move_xy(int(W/2 - len(uri)/2), int(H/2)) + term.cadetblue1 + uri + term.normal,
+                        term.move_xy(int(W/2 - (len(str(currentPos)) + len(str(totalURLs)) + 10)/2), int(H/2 + 2)), currentPos, "out of", totalURLs,
+                        "\n\n", text[1]
+                    )
+
+                    # Download the media file
+                    try:
+                        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                            ydl.download([uri])
+                        # Obtain the file paths for creating the temp and output folders
+                        filename = downFileName.encode('ascii','ignore').decode('ascii')
+                        os.rename(str(Path(mediaPath + r'/' + filename)), str(Path(tempPath + r'/' + filename)))
+                        currentPos = currentPos+1
+
+                    except:
+                        if eMessage != "suppress":
+                            eMessage = errorHandler(errorMessage, uri)
+                        UnhandledURLs.append(uri + "\n")
+                        currentPos = currentPos+1
+
+                        clear()
+                        text = "ERROR: unable to download last URL, skipping."
+
+                        print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2)) + term.brown1 + text + term.normal)
+                        countdown(3)
+
+            # Check if there are any files over 8MB
+            filePathList = getListOfFiles(tempPath)
+            totalFiles = len(filePathList)
+
+            for fullFilePath in filePathList:
+                fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
+                if getFileSize(fullFilePath) > 8192.00:
+                    largeFileCount = largeFileCount+1
+            
+            # Ask the user if they want to compress any files over 8MB
+            if largeFileCount > 0:
+                clear()
+                text = "Download complete. Do you wish to compress the media? (y/n)"
+                print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='\n\n')
+            
+                userInput = input(">> ")
+
+                if userInput.lower() == "y":
+                    currentPos = 0
+                    
+                    # Iterate through filePathList and determine if the file needs conversion
+                    for fullFilePath in filePathList:
+                        fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
+                        filename = os.path.basename(fullFilePath)
+                        currentPos = currentPos+1
+                        if os.path.isfile(fullFilePath):
+                            if getFileSize(fullFilePath) > 8192.00:
+                                convert(filename, fullFilePath, mediaPath)
+                                os.remove(fullFilePath)
+                            else:
+                                os.replace(fullFilePath, str(Path(outputPath + r'/' + filename))) 
+
+        else:
+            clear()
+            text = ["URL.txt", "was not found. Please create", "and try again.", "Press enter to continue."]
+
+            print(
+                term.move_xy(int(W/2 - 59/2), int(H/2 - 1)), term.cadetblue1 + text[0] + term.normal, 
+                text[1],
+                term.cadetblue1 + text[0] + term.normal,
+                text[2],
+                term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 1)), text[3]
+            )
+            input()
+            return
+        
+        # Try to cleanup any remaining files in the temp folder. Remove the temp folder once it is empty
+        clear()
+        print("Attempting to cleanup...\n")
+        counter = 0
+        while True:
+            try:
+                # Copy any files in the temp folder to the output folder
+                for fullFilePath in filePathList:
+                    fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
+                    filename = os.path.basename(fullFilePath)
+                    os.replace(fullFilePath, str(Path(outputPath + r'/' + filename)))
+
+                time.sleep(1)
+                shutil.rmtree(tempPath)
+                break
+            except PermissionError: # Uh oh
+                if counter != 0:
+                    clear()
+                    if checkIfProcessRunning('ffmpeg'):
+                        print('A stalled video conversion has been detected. Attempting to terminate...')
+                    else:
+                        print(Back.RED + Fore.White + "An error occured while removing/moving temporary files. Save any remaining files in the temp folder.\n")
+                        print("Press enter to continue.")
+                        input()
+                    break
+                else:
+                    print("Attempting to remove temporary files...")
+                    time.sleep(2)
+                    counter = counter + 1
+
+        clear()
+
+        UnhandledCount = len(UnhandledURLs)
+        if UnhandledCount > 0:
+
+            unsupportedURL = open("Unsupported URLs.txt", "w")
+            unsupportedURL.writelines(UnhandledURLs)
+            unsupportedURL.close()
+
+            print("There are some URLs that I was unable to access. They have been saved into a text file called 'Unsupported URLs.txt'. It is ", end='')
+            print("located in the same directory as the script.\n")
+        
+        print("Operation(s) complete. The media files are located at:", Back.MAGENTA + Fore.WHITE + outputPath)
+        print("\nPress enter to continue.")
+
+        input()
+        clear()
+        break
+
 def singleFileConvert():
     clear()
     notLoaded = True
@@ -460,11 +666,12 @@ def singleFileConvert():
                 fullFilePath = str(Path(currentDir + r'/' + filename))
                 outputDir = str(Path(currentDir + r'/output'))
             else: # Full path was entered
-                filename = os.path.basename(userInput) 
-                filePath = os.path.dirname(userInput)
+                filename = str(Path(os.path.basename(userInput) ))
+                filePath = str(Path(os.path.dirname(userInput)))
                 fullFilePath = str(Path(userInput))
                 outputDir = str(Path(filePath + r'/output'))
                 outputFile = str(Path(filePath + r'/output/' + filename))
+                createOutputFolder(filePath)
 
             if os.path.isfile(fullFilePath):
                 notLoaded = False
@@ -509,7 +716,7 @@ def singleFileConvert():
                 term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
             )
             countdown(5)
-            os.rename(fullFilePath, str(Path(outputDir + r'/OLD_' + filename)))
+            os.remove(fullFilePath)
 
         elif exitStatus == 0:
             clear()
@@ -521,8 +728,7 @@ def singleFileConvert():
         if userInput.lower() == "menu":
             clear()
             pass
-        else:
-            print(e)
+
 def singleURLConvert():
     clear()
     notFile = True
@@ -530,7 +736,6 @@ def singleURLConvert():
     mediaPath = os.path.dirname(__file__)
     outputPath = str(Path(mediaPath + r'/output'))
     
-        
     while notFile:
         url = "https://static1.e621.net/data/sample/89/85/8985342ea8ff4e4c4692f55e082aadb1.jpg"
         print(
