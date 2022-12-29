@@ -67,9 +67,8 @@ def configuration():
         # Creates required files and folders.
         scriptPath = os.path.dirname(__file__)
         URLTextPath = str(Path(scriptPath + r'/URL.txt'))
-        UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URL.txt'))
+        UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
         outputPath = str(Path(scriptPath + r'/output'))
-        tempPath = str(Path(scriptPath + r'/temp'))
 
         if not os.path.exists(URLTextPath):
             fp = open(URLTextPath, 'x')
@@ -79,8 +78,6 @@ def configuration():
             fp.close()
         if not os.path.exists(outputPath):
             os.mkdir(outputPath)
-        if not os.path.exists(tempPath):
-            os.mkdir(tempPath)
 
         os.chdir(os.path.dirname(__file__))
 
@@ -118,9 +115,8 @@ def checkIfProcessRunning(processName):
 
 def convert(filename, filenamePath):
     outputPath = str(Path(filenamePath + r'/output')) # Output path
-    outputFile = str(Path(outputPath + r'/' + filename))    # Output file
-    fullFilePath = str(Path(filenamePath + r'/' + filename))
-    inputFile = fullFilePath # Input File
+    outputFile = str(Path(outputPath + r'/' + filename)) # Output file
+    inputFile = str(Path(filenamePath + r'/' + filename)) # Input file
     ext = os.path.splitext(filename) # Extension
     codec = ""
     
@@ -411,11 +407,10 @@ def multipleURLConvert():
     notFile = True
     mediaPath = os.getcwd()
     outputPath = str(Path(mediaPath + r'/output'))
-    tempPath = str(Path(mediaPath + r'/temp'))
     UnhandledURLs = list()
     URIList = list()
     largeFileCount = 0
-    currentPos = 0
+    currentPos = 1
         
     while notFile:
         clear()
@@ -431,7 +426,7 @@ def multipleURLConvert():
             term.move_xy(int(W/2 - len(text[4])/2), int(H/2 + 4)) + text[4] + "\n\n"
             )
 
-        userInput = input("")
+        userInput = input(">>")
         print()
 
         if userInput.lower() == "menu":
@@ -472,7 +467,7 @@ def multipleURLConvert():
                         term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
                         term.move_xy(int(W/2 - len(uri)/2), int(H/2)) + term.cadetblue1 + uri + term.normal,
                         term.move_xy(int(W/2 - (len(str(currentPos)) + len(str(totalURLs)) + 10)/2), int(H/2 + 2)), currentPos, "out of", totalURLs,
-                        "\n\n", text[1]
+                        "\n\n" + text[1]
                     )
 
                     # Download the media file
@@ -481,9 +476,10 @@ def multipleURLConvert():
                             ydl.download([uri])
                         # Obtain the file paths for creating the temp and output folders
                         filename = downFileName.encode('ascii','ignore').decode('ascii')
-                        os.rename(str(Path(mediaPath + r'/' + filename)), str(Path(tempPath + r'/' + filename)))
                         currentPos = currentPos+1
-
+                    except FileExistsError:
+                            os.remove(filename)
+                            currentPos = currentPos+1
                     except:
                         if eMessage != "suppress":
                             eMessage = errorHandler(errorMessage, uri)
@@ -497,8 +493,7 @@ def multipleURLConvert():
                         countdown(3)
 
             # Check if there are any files over 8MB
-            filePathList = getListOfFiles(tempPath)
-            totalFiles = len(filePathList)
+            filePathList = getListOfFiles(mediaPath)
 
             for fullFilePath in filePathList:
                 fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
@@ -518,16 +513,19 @@ def multipleURLConvert():
                     
                     # Iterate through filePathList and determine if the file needs conversion
                     for fullFilePath in filePathList:
-                        fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
-                        filename = os.path.basename(fullFilePath)
+                        filename = str(Path(os.path.basename(fullFilePath)))
+                        filePath = str(Path(os.path.dirname(fullFilePath)))
+                        fullOutPath = str(Path(mediaPath + r'/output'))
+                        fullOutFileName = str(Path(fullOutPath + r'/' + filename))
                         currentPos = currentPos+1
+
                         if os.path.isfile(fullFilePath):
                             if getFileSize(fullFilePath) > 8192.00:
-                                convert(filename, fullFilePath, mediaPath)
+                                convert(filename, filePath)
                                 os.remove(fullFilePath)
+                                clear()
                             else:
-                                os.replace(fullFilePath, str(Path(outputPath + r'/' + filename))) 
-
+                                os.replace(fullFilePath, fullOutFileName)
         else:
             clear()
             text = ["URL.txt", "was not found. Please create", "and try again.", "Press enter to continue."]
@@ -541,41 +539,6 @@ def multipleURLConvert():
             )
             input()
             return
-        
-        # Try to cleanup any remaining files in the temp folder. Remove the temp folder once it is empty
-        clear()
-        print("Attempting to cleanup...\n")
-        counter = 0
-        while True:
-            try:
-                # Copy any files in the temp folder to the output folder
-                for fullFilePath in filePathList:
-                    fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
-                    filename = os.path.basename(fullFilePath)
-                    os.replace(fullFilePath, str(Path(outputPath + r'/' + filename)))
-
-                time.sleep(1)
-                shutil.rmtree(tempPath)
-                break
-            except PermissionError: # Uh oh
-                clear()
-                if counter != 0:
-                    if checkIfProcessRunning('ffmpeg'):
-                        print('A stalled video conversion has been detected. Attempting to terminate...')
-                    else:
-                        text = ["An error occured while removing/moving temporary files. Save any remaining files in the temp folder.", 
-                        "Press enter to continue."]
-
-                        print(
-                            term.brown1 + term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)), text[0],
-                            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)), text[1]
-                            )
-                        input()
-                    break
-                else:
-                    print("Attempting to remove temporary files...")
-                    time.sleep(2)
-                    counter = counter + 1
 
         clear()
 
