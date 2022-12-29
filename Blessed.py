@@ -121,8 +121,10 @@ def convert(filename, filenamePath):
     codec = ""
     
     now = datetime.datetime.now()
-    text = "Time the Process started: " + now.strftime('%I:%M %p')
-    print(term.move_xy(int(W/2 - len(text)/2), int(H/2 + 4)) + text + "\n")
+    text = ["Processing", "Time the Process started: " + now.strftime('%I:%M %p')]
+    print(
+        term.move_xy(int(W/2 - (len(text[0]) + len(filename))/2), int(H/2 + -4)) + text[0], term.cadetblue1 + filename + term.normal,
+        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 4)) + text[1])
 
     if ext[1] == ".gif" or ext[1] == ".webm" or ext[1] == ".mp4":
         # Setup paths and codec options
@@ -200,28 +202,29 @@ def errorHandler(origError, uri):
     if errorNumber == 0:
         clear()
 
-        print("ERROR 0: An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+        print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
         print("include the URL and error message found below in your issue:\n")
         print(uri, "\n")
         print(error)
     elif errorNumber == 1:
         clear()
 
-        print("ERROR 1: Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
+        print(term.brown1 + "ERROR 1:" + term.normal, "Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
         print("You can try right clicking the media and click 'Copy Video/Image Address'. Otherwise you will have to use the ", end='')
-        print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported.\n")
+        print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported. Check the", 
+        term.link("https://github.com/jose011974/Download-Compress-Media","GitHub"), "page for more information on supported URLs.\n")
         print("URL:", uri)
 
     elif errorNumber == 2:
         clear()
 
-        print("ERROR 2: Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
+        print(term.brown1 + "ERROR 2:" + term.normal, "Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
         print("URL:", uri)
 
     elif errorNumber == 3:
         clear()
 
-        print("ERROR 3: The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
+        print(term.brown1 + "ERROR 3:" + term.normal, "The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
         print("URL:", uri)
         
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
@@ -248,6 +251,9 @@ def getFileSize(file):
     return fileSize
 
 def getListOfFiles(dirName):
+    os.chdir(os.path.dirname(__file__))
+    folderPath = os.getcwd()
+    oldOutPath = str(Path(folderPath + r'/' + "output_old"))
     global folderCounter
     folderCounter = 0
     # create a list of file and sub directories 
@@ -257,6 +263,9 @@ def getListOfFiles(dirName):
     # Iterate over all the entries
     for entry in listOfFile:
         # Create full path
+        if dirName == oldOutPath:
+            folderCounter = folderCounter + 1
+            return list()
         fullPath = os.path.join(dirName, entry)
         # If entry is a directory then get the list of files in this directory 
         if os.path.isdir(fullPath):
@@ -341,6 +350,37 @@ def main():
 def multipleFileConvert():
     notFile = True
     mediaPath = str(Path(workingDirectory()))
+    outputPath = str(Path(mediaPath + r'/output'))
+    oldOutPath = str(Path(mediaPath + r'/output_old'))
+
+    if os.path.exists(outputPath):
+        files = getListOfFiles(outputPath)
+        if len(files) != 0:
+            clear()
+
+            text = ["A folder named 'output' has been detected. For compatability reasons, the folder must be renamed to 'output_old'.", 
+            "Do you wish to proceed? (y/n)"]
+
+            print(term.move_xy(int(W/2 - countStrings(text)/2), int(H/2)) + text[0], text[1], "\n\n")
+            userInput = input(">>")
+
+            if userInput.lower() == "n":
+                return
+            elif userInput.lower() == "y":
+                try:
+                    os.rename(outputPath, oldOutPath)
+                    os.mkdir(outputPath)
+                except FileExistsError:
+                    clear()
+
+                    text = ["A folder named 'output_old' exists. You must rename it in order to preserve data you may want.", "Press enter to continue."]
+
+                    print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + term.brown1 + text[0] + term.normal, end='')
+                    countdown(3)
+                    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1], end='')
+                    
+                    input()
+                    return
     
     if mediaPath == "menu":
         clear()
@@ -371,7 +411,9 @@ def multipleFileConvert():
             fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
             filename = os.path.basename(fullFilePath)
             filePath = os.path.dirname(fullFilePath)
-            convFile = str(Path(mediaPath + r'/output/' + filename)) # Output file path
+            oldConvFile = str(Path(outputPath + r'/old_' + filename)) # old Output file path
+            convFile = str(Path(outputPath + r'/' + filename)) # Output file path
+
 
             if os.path.isfile(fullFilePath):
                 if getFileSize(fullFilePath) > 8192.00:
@@ -381,8 +423,11 @@ def multipleFileConvert():
                         term.cadetblue1 + filename + term.normal + text2)
                         # print("\nCompressing " + term.cadetblue1 + filename + term.normal + " | " + str(getFileSize(fullFilePath)) + " MB | File " + str(currentPos) + " of " + str(totalFiles) + "\n")
                         convert(filename, filePath)
+                        shutil.copy(fullFilePath, oldConvFile)
+                        os.remove(fullFilePath)
                 else:
                     shutil.copy(fullFilePath, convFile)
+                    os.remove(fullFilePath)
         
         clear()      
         text = ["Procedure complete. The files are located at:", 
@@ -392,7 +437,7 @@ def multipleFileConvert():
         print(
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
             term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal,
-            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1],
+            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1], end=''
             )
 
         countdown(5)
@@ -407,11 +452,40 @@ def multipleURLConvert():
     notFile = True
     mediaPath = os.getcwd()
     outputPath = str(Path(mediaPath + r'/output'))
+    oldOutPath = str(Path(mediaPath + r'/output_old'))
     UnhandledURLs = list()
     URIList = list()
     largeFileCount = 0
     currentPos = 1
-        
+
+    if os.path.exists(outputPath):
+        files = getListOfFiles(outputPath)
+        if len(files) != 0:
+            clear()
+
+            text = ["A folder named 'output' has been detected. For compatability reasons, the folder must be renamed to 'output_old'.", 
+            "Do you wish to proceed? (y/n)"]
+
+            print(term.move_xy(int(W/2 - countStrings(text)/2), int(H/2)) + text[0], text[1], "\n\n")
+            userInput = input(">>")
+
+            if userInput.lower() == "n":
+                return
+            elif userInput.lower() == "y":
+                try:
+                    os.rename(outputPath, oldOutPath)
+                    os.mkdir(outputPath)
+                except FileExistsError:
+                    clear()
+
+                    text = ["A folder named 'output_old' exists. You must rename it in order to preserve data you may want.", "Press enter to continue."]
+
+                    print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + term.brown1 + text[0] + term.normal, end='')
+                    countdown(3)
+                    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1], end='')
+                    
+                    input()
+                    return
     while notFile:
         clear()
         text = ["Please create a file called", "URL.txt",  "at", "and insert a URL at each line. Press enter when you are ready.", 
@@ -489,7 +563,7 @@ def multipleURLConvert():
                         clear()
                         text = "ERROR: unable to download last URL, skipping."
 
-                        print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2)) + term.brown1 + text + term.normal)
+                        print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
                         countdown(3)
 
             # Check if there are any files over 8MB
@@ -510,13 +584,14 @@ def multipleURLConvert():
 
                 if userInput.lower() == "y":
                     currentPos = 0
+                    if not os.path.isdir(outputPath):
+                        os.mkdir(outputPath)
                     
                     # Iterate through filePathList and determine if the file needs conversion
                     for fullFilePath in filePathList:
                         filename = str(Path(os.path.basename(fullFilePath)))
                         filePath = str(Path(os.path.dirname(fullFilePath)))
-                        fullOutPath = str(Path(mediaPath + r'/output'))
-                        fullOutFileName = str(Path(fullOutPath + r'/' + filename))
+                        fullOutFileName = str(Path(outputPath + r'/' + filename))
                         currentPos = currentPos+1
 
                         if os.path.isfile(fullFilePath):
@@ -525,7 +600,16 @@ def multipleURLConvert():
                                 os.remove(fullFilePath)
                                 clear()
                             else:
-                                os.replace(fullFilePath, fullOutFileName)
+                                shutil.copy(fullFilePath, fullOutFileName)
+                                os.remove(fullFilePath)
+                else:
+                    for fullFilePath in filePathList:
+                        filename = str(Path(os.path.basename(fullFilePath)))
+                        filePath = str(Path(os.path.dirname(fullFilePath)))
+                        fullOutFileName = str(Path(outputPath + r'/' + filename))
+
+                        shutil.copy(fullFilePath, fullOutFileName)
+                        os.remove(fullFilePath)
         else:
             clear()
             text = ["URL.txt", "was not found. Please create", "and try again.", "Press enter to continue."]
@@ -535,12 +619,22 @@ def multipleURLConvert():
                 text[1],
                 term.cadetblue1 + text[0] + term.normal,
                 text[2],
-                term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 1)), text[3]
+                term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 1)), text[3], end=''
             )
+            countdown(3)
             input()
             return
 
         clear()
+
+        text = ["Procedure complete.", "Downloaded media has been saved to:", "Press enter to continue"]
+
+        print(
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+            term.move_xy(int(W/2 - (len(text[1]) + len(outputPath))/2), int(H/2 - 1)) + term.palegreen + text[1], term.cadetblue1 + outputPath + term.normal, end=''
+            )
+
+        
 
         if len(UnhandledURLs) > 0:
 
@@ -548,19 +642,20 @@ def multipleURLConvert():
             unsupportedURL.writelines(UnhandledURLs)
             unsupportedURL.close()
 
-            text = ["Procedure complete.", "Downloaded media has been saved to:", "Unavailable URLs have been saved to", "Unsupported URLs.txt", 
-            "Press enter to continue"]
+            text = ["Unavailable URLs have been saved to", "Unsupported URLs.txt", "Press enter to continue."]
 
             print(
-                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
-                term.move_xy(int(W/2 - (len(text[1]) + len(outputPath))/2), int(H/2 - 1)) + term.palegreen + text[1], term.cadetblue1 + outputPath + term.normal,
-                term.move_xy(int(W/2 - (len(text[2]) + len(mediaPath))/2), int(H/2 + 1)) + term.palegreen + text[2] + term.cadetblue1  + ":", mediaPath + term.normal
+                term.move_xy(int(W/2 - (len(text[0]) + len(mediaPath) + len(text[1]))/2), int(H/2 + 1)) + term.palegreen + text[0] + term.cadetblue1  + ":", 
+                mediaPath + text[1] + term.normal, end=''
                 )
             countdown(5)
-            print(term.move_xy(int(W/2 - len(text[4])/2), int(H/2 + 3)) + text[4])
-
+            print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
             input()
-            clear()
+
+        countdown(5)
+        print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
+        input()
+
         break
 
 def openUnsupportedURLs():
@@ -754,8 +849,9 @@ def singleURLConvert():
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
 
-                    filenamePath = str(Path(mediaPath + r'/' + downFileName.encode('ascii','ignore').decode('ascii')))
-                    filename = os.path.basename(filenamePath)
+                    fullFilenamePath = str(Path(mediaPath + r'/' + downFileName.encode('ascii','ignore').decode('ascii')))
+                    filename = os.path.basename(fullFilenamePath)
+                    filePath = os.path.dirname(fullFilenamePath)
                     outFile = str(Path(outputPath + r'/' + filename))
 
                     # Create an output directory
@@ -765,7 +861,7 @@ def singleURLConvert():
                 errorHandler(errorMessage, uri)
                 return
 
-            fileSize = getFileSize(filenamePath)
+            fileSize = getFileSize(fullFilenamePath)
 
             if fileSize > 8192.00:
                 clear()
@@ -778,24 +874,42 @@ def singleURLConvert():
                     clear()
                     text = "Compressing"
                     print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
-                    convert(filename, filenamePath)
+                    convert(filename, filePath)
 
                     clear()
                     text = ["The media file has been sucessfully compressed and is located at", "Returning to the main menu in"]
                     print(
                         term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0], 
-                        term.move_xy(int(W/2 - len(outFile)/2), int(H/2 )), term.cadetblue1 + outFile, term.normal, "\n",
+                        term.move_xy(int(W/2 - len(outFile)/2), int(H/2)), term.cadetblue1 + outFile, term.normal, "\n",
                         term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
                     )
 
                     countdown(5)
                     return
                 else:
-                    clear()
-                    return
+                    try:
+                        shutil.copy(fullFilenamePath, outFile)
+                        os.remove(fullFilenamePath)
+                    except FileExistsError:
+                        clear()
+
+                        text = ["A file with the name", "already exists. Would you like to overwrite it? (Y/N)\n"]
+                        textLength = countStrings(text) + len(filename)
+                        
+                        print(term.move_xy(int(W/2 - textLength/2), int(H/2)) + text[0], term.cadetblue1, filename, term.normal, text[1], end='\n\n')
+                        userInput = input(">> ")
+
+                        if userInput.lower() == "y":
+                            shutil.copy(fullFilenamePath, outFile)
+                            os.remove(fullFilenamePath)
+                        elif userInput.lower() == "n":
+                            clear()
+                            return
+                        return
             else:
                 try:
-                    os.rename(filenamePath, outFile)
+                    shutil.copy(fullFilenamePath, outFile)
+                    os.remove(fullFilenamePath)
                 except FileExistsError:
                     clear()
 
@@ -806,7 +920,8 @@ def singleURLConvert():
                     userInput = input(">> ")
 
                     if userInput.lower() == "y":
-                        shutil.copy(filenamePath, outFile)
+                        shutil.copy(fullFilenamePath, outFile)
+                        os.remove(fullFilenamePath)
                     elif userInput.lower() == "n":
                         clear()
                         return
@@ -816,9 +931,9 @@ def singleURLConvert():
             text = ["Media successfully downloaded and is located at", "Returning to main menu in"]
 
             print(
-                term.move_xy(int(W/2 - 47/2), int(H/2 - 2)) + text[0] + "\n\n", 
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0] + "\n\n", 
                 term.move_xy(int(W/2 - len(outputPath)/2), int(H/2)) + term.cadetblue1, outputPath, term.normal, 
-                term.move_xy(int(W/2 - 38/2), int(H/2 + 2)) + text[1], end=''
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
                 )
             
             countdown(5)
