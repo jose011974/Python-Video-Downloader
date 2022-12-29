@@ -316,53 +316,11 @@ def main():
             elif userInput == 4:
                 multipleURLConvert()
             elif userInput == 5:
-                spoil("spoil")
+                spoilMedia(1)
             elif userInput == 6:
-                spoil("no spoil")
+                spoilMedia(0)
             elif userInput == 7:
-                counter = 1
-                URLCounter = 0
-                clear()
-
-                print("All of the URLs in 'Unsupported URLs.txt' will be opened 10 at a time.\n")
-                print("Press enter to continue.")
-                
-                input()
-
-                URLs = list()
-
-                for line in fileinput.FileInput(str(Path(os.path.dirname(__file__) + r'/Unsupported URLs.txt',inplace=1))):
-                    if line.rstrip():
-                        URLs.append(line)
-
-                if len(URLs) == 0:
-                    clear()
-
-                    print("There were no URLs detected.\n")
-                    print("Press enter to continue.")
-                    input()
-
-                while True:
-                    if counter == len(URLs) + 1:
-                        break
-
-                    for URL in URLs:
-                        clear()
-
-                        print("OPENING", counter, "OUT OF", len(URLs))
-                        webbrowser.open(URL, new=0, autoraise=False)
-                        time.sleep(0.4)
-                        counter = counter + 1
-                        URLCounter = URLCounter + 1
-
-                    if URLCounter >= 10:
-                        clear()
-                        print("Opened 10 URLs. Press enter to continue.")
-                        input()
-                        URLCounter = 0
-                
-                clear()
-                print("Process complete. Press enter to continue.")
+                openUnsupportedURLs()
 
             elif userInput == 8:
                 webbrowser.open("https://github.com/jose011974/Download-Compress-Media", new=1)
@@ -431,19 +389,18 @@ def multipleFileConvert():
                     shutil.copy(fullFilePath, convFile)
         
         clear()      
-        text = "Procedure complete. The files are located at:"
-        path = os.path.dirname(convFile)
-        text2 = "Note: The files may still be large. If that is the case, segment the files or use a different program/service."
-        text3 = "Please press Enter to continue."
+        text = ["Procedure complete. The files are located at:", 
+                "Note: The files may still be large. If that is the case, segment the files or use a different program/service.", 
+                "Press Enter to continue."]
 
         print(
-            term.move_xy(int(W/2 - len(text)/2), int(H/2 - 2)) + text +
-            term.cadetblue1 + term.move_xy(int(W/2 - (len(path) + 21)/2), int(H/2)) + term.link(path, path) + term.normal + " (CTRL click to open)" +
-            term.move_xy(int(W/2 - len(text2)/2), int(H/2 + 2)) + text2, end=''
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+            term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal,
+            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1],
             )
 
         countdown(5)
-        print(term.move_xy(int(W/2 - len(text3)/2), int(H/2 + 4)) + text3, end='')
+        print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
         input()
 
         clear()
@@ -601,13 +558,18 @@ def multipleURLConvert():
                 shutil.rmtree(tempPath)
                 break
             except PermissionError: # Uh oh
+                clear()
                 if counter != 0:
-                    clear()
                     if checkIfProcessRunning('ffmpeg'):
                         print('A stalled video conversion has been detected. Attempting to terminate...')
                     else:
-                        print(Back.RED + Fore.White + "An error occured while removing/moving temporary files. Save any remaining files in the temp folder.\n")
-                        print("Press enter to continue.")
+                        text = ["An error occured while removing/moving temporary files. Save any remaining files in the temp folder.", 
+                        "Press enter to continue."]
+
+                        print(
+                            term.brown1 + term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)), text[0],
+                            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)), text[1]
+                            )
                         input()
                     break
                 else:
@@ -617,22 +579,87 @@ def multipleURLConvert():
 
         clear()
 
-        UnhandledCount = len(UnhandledURLs)
-        if UnhandledCount > 0:
+        if len(UnhandledURLs) > 0:
 
             unsupportedURL = open("Unsupported URLs.txt", "w")
             unsupportedURL.writelines(UnhandledURLs)
             unsupportedURL.close()
 
-            print("There are some URLs that I was unable to access. They have been saved into a text file called 'Unsupported URLs.txt'. It is ", end='')
-            print("located in the same directory as the script.\n")
-        
-        print("Operation(s) complete. The media files are located at:", Back.MAGENTA + Fore.WHITE + outputPath)
-        print("\nPress enter to continue.")
+            text = ["Procedure complete.", "Downloaded media has been saved to:", "Unavailable URLs have been saved to", "Unsupported URLs.txt", 
+            "Press enter to continue"]
 
-        input()
-        clear()
+            print(
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+                term.move_xy(int(W/2 - (len(text[1]) + len(outputPath))/2), int(H/2 - 1)) + term.palegreen + text[1], term.cadetblue1 + outputPath + term.normal,
+                term.move_xy(int(W/2 - (len(text[2]) + len(mediaPath))/2), int(H/2 + 1)) + term.palegreen + text[2] + term.cadetblue1  + ":", mediaPath + term.normal
+                )
+            countdown(5)
+            print(term.move_xy(int(W/2 - len(text[4])/2), int(H/2 + 3)) + text[4])
+
+            input()
+            clear()
         break
+
+def openUnsupportedURLs():
+    UnsupURLTextFile = str(Path(os.path.dirname(__file__) + r'/Unsupported URLs.txt'))
+
+    if not os.path.isfile(UnsupURLTextFile):
+        clear()
+
+        text = ["Unsupported URLs.txt", "was not found. Returning to the main menu in:"]
+        print(term.move_xy(int(W/2 - (20+45)/2), int(H/2)) + term.cadetblue1 + text[0], term.normal + text[1], end='')
+        countdown(5)
+        return
+
+    counter = 1
+    URLCounter = 0
+    clear()
+
+    text = ["All of the URLs in 'Unsupported URLs.txt' will be opened 10 at a time.", "Press enter to continue."]
+
+    print(
+        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0],
+        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
+    )
+    input()
+
+    URLs = list()
+    for line in fileinput.FileInput(UnsupURLTextFile,inplace=1):
+        if line.rstrip():
+            URLs.append(line)
+
+    if len(URLs) == 0:
+        clear()
+
+        text = ["There were no URLs detected.", "Press enter to continue."]
+
+        print(
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0],
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 + 1)) + text[1]
+        )
+        input()
+
+    while True:
+        if counter == len(URLs) + 1:
+            break
+
+        for URL in URLs:
+            clear()
+
+            print("OPENING", counter, "OUT OF", len(URLs))
+            webbrowser.open(URL, new=0, autoraise=False)
+            time.sleep(0.4)
+            counter = counter + 1
+            URLCounter = URLCounter + 1
+
+        if URLCounter >= 10:
+            clear()
+            print("Opened 10 URLs. Press enter to continue.")
+            input()
+            URLCounter = 0
+
+    clear()
+    print("Process complete. Press enter to continue.")
 
 def singleFileConvert():
     clear()
@@ -833,6 +860,57 @@ def singleURLConvert():
             
             countdown(5)
             return
+
+def spoilMedia(option):
+    clear()
+
+    mediaPath = workingDirectory()
+    filePathList = getListOfFiles(mediaPath)
+
+    if option == "spoil":
+        text = ["I will now append 'SPOILER' to the files in", "Press enter to continue"]
+        print(
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal
+        )
+        countdown(3)
+        print
+        input(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
+
+        for file in filePathList:
+            os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file))
+            pass
+    elif option == "no spoil":
+
+        text = ["I will now remove 'SPOILER' from the files in", "Press enter to continue"]
+        print(
+            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal
+        )
+        countdown(3)
+        print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
+        input()
+
+        for file in filePathList:
+            newFileName = os.path.basename(file)
+            os.replace(file, mediaPath + r'/' + newFileName[8:])
+            pass
+
+    clear()
+
+    text = ["Procedure complete. The files are located at:", 
+    "Note: The files may still be large. If that is the case, segment the files or use a different program/service.", 
+    "Press Enter to continue."]
+
+    print(
+        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+        term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal,
+        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1],
+        )
+
+    countdown(5)
+    print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
+    input()
 
 def title():
 
