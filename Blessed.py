@@ -332,7 +332,7 @@ def main():
 
                 clear()
 
-                print("The Github page should have opened. If it did not, please go to https://github.com/jose011974/Download-Compress-Media\n")
+                print("The Github page should have opened. If it did not, please go to https://github.com/jose011974/Download-Compress-Media (CTRL click to open)\n")
                 print("Press enter to continue.\n")
                 input()
 
@@ -943,13 +943,17 @@ def spoilMedia(option):
     clear()
 
     mediaPath = workingDirectory()
+
+    if mediaPath == "menu":
+        return
+
     filePathList = getListOfFiles(mediaPath)
 
-    if option == "spoil":
+    if option == 1:
         text = ["I will now append 'SPOILER' to the files in", "Press enter to continue"]
         print(
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
-            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal
+            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
         countdown(3)
         print
@@ -958,12 +962,12 @@ def spoilMedia(option):
         for file in filePathList:
             os.replace(file, mediaPath + r'/' + "SPOILER_" + os.path.basename(file))
             pass
-    elif option == "no spoil":
+    elif option == 0:
 
         text = ["I will now remove 'SPOILER' from the files in", "Press enter to continue"]
         print(
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
-            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal
+            term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
         countdown(3)
         print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
@@ -976,18 +980,15 @@ def spoilMedia(option):
 
     clear()
 
-    text = ["Procedure complete. The files are located at:", 
-    "Note: The files may still be large. If that is the case, segment the files or use a different program/service.", 
-    "Press Enter to continue."]
+    text = ["Procedure complete. The files are located at:", "Press Enter to continue."]
 
     print(
         term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
-        term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal,
-        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1],
+        term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
 
     countdown(5)
-    print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
+    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 3)) + text[1])
     input()
 
 def title():
