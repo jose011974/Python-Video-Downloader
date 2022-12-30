@@ -52,50 +52,6 @@ def clear():
 
     title()
 
-def configuration():
-
-    updateDependencies()
-
-    global term
-    global W,H
-    term = blessed.Terminal()
-    W,H = term.width, term.height
-
-    while True:
-        clear()
-
-        # Creates required files and folders.
-        scriptPath = os.path.dirname(__file__)
-        URLTextPath = str(Path(scriptPath + r'/URL.txt'))
-        UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
-        outputPath = str(Path(scriptPath + r'/output'))
-
-        if not os.path.exists(URLTextPath):
-            fp = open(URLTextPath, 'x')
-            fp.close()
-        if not os.path.exists(UnsuppURLPath):
-            fp = open(UnsuppURLPath, 'x')
-            fp.close()
-        if not os.path.exists(outputPath):
-            os.mkdir(outputPath)
-
-        os.chdir(os.path.dirname(__file__))
-
-        if platform.system() == "Windows":
-            ffPath = "C:/ffmpeg/ffmpeg.exe"
-            try:
-                if not os.path.isfile(ffPath):
-                    raise Exception()
-            except Exception:
-                clear()
-                print(
-                    term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + "You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/" +
-                    term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + "Compression features will not work if you choose to proceed." + term.normal +
-                    term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + "Press enter to continue."
-                )
-                input()
-        main()
-
 def checkIfProcessRunning(processName):
     # For whatever reason, sometimes a video conversion process is stalled. This function kills any and all ffmpeg processes as you cannot move a file
     # that is in use by a process.
@@ -381,6 +337,9 @@ def multipleFileConvert():
                     
                     input()
                     return
+    else:
+        if not os.path.isdir(outputPath):
+            os.mkdir(outputPath)
     
     if mediaPath == "menu":
         clear()
@@ -413,7 +372,6 @@ def multipleFileConvert():
             filePath = os.path.dirname(fullFilePath)
             oldConvFile = str(Path(outputPath + r'/old_' + filename)) # old Output file path
             convFile = str(Path(outputPath + r'/' + filename)) # Output file path
-
 
             if os.path.isfile(fullFilePath):
                 if getFileSize(fullFilePath) > 8192.00:
@@ -1049,7 +1007,7 @@ def updateDependencies():
             print("An unknown error has occured. Please file a bug report at " +
             "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report and be sure to include a copy of the terminal output.")
 
-    packages = ["python-magic", "Pillow", "youtube-dl"]
+    packages = ["blessed", "numpy", "python-magic", "Pillow", "youtube-dl"]
 
     # Turns out the library needed for magic on Windows has been out of date since 2009. These are up to date and will work with Windows 10.
     if platform.system() == "Windows":
@@ -1149,7 +1107,8 @@ ydl_opts = {
 
 # ---------------------------------
 
-import distro
+updateDependencies()
+
 import magic
 import psutil
 import validators
@@ -1160,16 +1119,43 @@ import datetime
 from numpy import char
 from PIL import Image
 
-debug = 1
+global term
+global W,H
+term = blessed.Terminal()
+W,H = term.width, term.height
 
-if debug == 0:
+while True:
+    clear()
 
-    try:
-        configuration()
-    except Exception as e:
-        clear()
+    # Creates required files and folders.
+    scriptPath = os.path.dirname(__file__)
+    URLTextPath = str(Path(scriptPath + r'/URL.txt'))
+    UnsuppURLPath = str(Path(scriptPath + r'/Unsupported URLs.txt'))
+    outputPath = str(Path(scriptPath + r'/output'))
 
-        print("An error has occured. Please take note of the error and create a bug report at " +
-        "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report\n\n" + str(e))
-elif debug == 1:
-    configuration()
+    if not os.path.exists(URLTextPath):
+        fp = open(URLTextPath, 'x')
+        fp.close()
+    if not os.path.exists(UnsuppURLPath):
+        fp = open(UnsuppURLPath, 'x')
+        fp.close()
+    if not os.path.exists(outputPath):
+        os.mkdir(outputPath)
+
+    os.chdir(os.path.dirname(__file__))
+
+    if platform.system() == "Windows":
+        ffPath = "C:/ffmpeg/ffmpeg.exe"
+        try:
+            if not os.path.isfile(ffPath):
+                raise Exception()
+        except Exception:
+            clear()
+            print(
+                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + "You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/" +
+                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + "Compression features will not work if you choose to proceed." + term.normal +
+                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + "Press enter to continue."
+            )
+            input()
+    main()
+
