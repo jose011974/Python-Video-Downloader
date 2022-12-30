@@ -1,3 +1,5 @@
+# You can ignore these, I kept forgeting the syntax for the colors and centering text.
+
 # term.cadetblue1
 # term.brown1
 # term.move_xy(int(W/2 - len(text variable goes here)/2), int(H/2))
@@ -58,8 +60,6 @@ def configuration():
     global W,H
     term = blessed.Terminal()
     W,H = term.width, term.height
-    distroID = distro.name(pretty=True)
-    distroID = "Linux Version: " + distroID
 
     while True:
         clear()
