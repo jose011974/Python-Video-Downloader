@@ -982,7 +982,7 @@ def updateDependencies():
         url = "https://bootstrap.pypa.io/get-pip.py"
         response = requests.get(url, allow_redirects=True)
 
-        print("pip, python's package manager, is not installed. I will attempt to download and install it for you. (3)\n\n")
+        print("pip, python's package manager, is not installed. I will attempt to download and install it for you.\n\n")
         time.sleep(3)
 
         if not response.status_code == 200:
@@ -1006,6 +1006,7 @@ def updateDependencies():
 
             print("An unknown error has occured. Please file a bug report at " +
             "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report and be sure to include a copy of the terminal output.")
+            input(">>")
 
     packages = ["blessed", "numpy", "python-magic", "Pillow", "youtube-dl"]
 
@@ -1118,6 +1119,7 @@ import datetime
 
 from numpy import char
 from PIL import Image
+from shutil import which
 
 global term
 global W,H
@@ -1151,11 +1153,30 @@ while True:
                 raise Exception()
         except Exception:
             clear()
+            text = ["You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/ffmpeg.exe", 
+            "Compression features will not work if you choose to proceed.", "Press enter to continue."]
+
             print(
-                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + "You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/" +
-                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + "Compression features will not work if you choose to proceed." + term.normal +
-                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + "Press enter to continue."
+                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + text[0],
+                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + text[2]
             )
             input()
+    elif platform.system() == "Linux":
+        try:
+            if which("ffmpeg") is None:
+                raise Exception()
+        except Exception:
+            clear()
+            text = ["You do not have ffmpeg installed. Please make sure it is installed via your package manager or via 'sudo apt install ffmpeg''", 
+            "Compression features will not work if you choose to proceed.","Press enter to continue."]
+
+            print(
+                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + text[0],
+                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + text [2]
+            )
+            input()
+
     main()
 
