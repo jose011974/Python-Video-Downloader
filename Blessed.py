@@ -1007,6 +1007,7 @@ def updateDependencies():
             print("An unknown error has occured. Please file a bug report at " +
             "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report and be sure to include a copy of the terminal output.")
             input(">>")
+            sys.exit()
 
     packages = ["blessed", "numpy", "python-magic", "Pillow", "youtube-dl"]
 
