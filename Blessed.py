@@ -269,9 +269,15 @@ def main():
             userInput = int(input(">> "))
 
             if userInput == 1:
-                singleFileConvert()
+                if noComp == True:
+                    noFFMPEG(0)
+                elif noComp == False:
+                    singleFileConvert()
             elif userInput == 2:
-                multipleFileConvert()
+                if noComp == True:
+                    noFFMPEG(0)
+                elif noComp == False:
+                    multipleFileConvert()
             elif userInput == 3: 
                 singleURLConvert()
             elif userInput == 4:
@@ -525,6 +531,9 @@ def multipleURLConvert():
                         countdown(3)
 
             # Check if there are any files over 8MB
+            if noComp == True:
+                noFFMPEG(1)
+                return
             filePathList = getListOfFiles(mediaPath)
 
             for fullFilePath in filePathList:
@@ -616,6 +625,15 @@ def multipleURLConvert():
 
         break
 
+def noFFMPEG(i):
+    clear()
+    text = "FFMPEG is not installed. This option has been disabled.", "FFMPEG is not installed. You are unable to compress media at this time."
+
+    print(
+        term.move_xy(int(W/2 - len(text[i])/2), int(H/2)) + term.brown1 + text[i] + term.normal, end=''
+    )
+    countdown(3)
+
 def openUnsupportedURLs():
     UnsupURLTextFile = str(Path(os.path.dirname(__file__) + r'/Unsupported URLs.txt'))
 
@@ -651,7 +669,7 @@ def openUnsupportedURLs():
 
         print(
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0],
-            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 + 1)) + text[1]
+            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
         )
         input()
 
@@ -822,6 +840,10 @@ def singleURLConvert():
             fileSize = getFileSize(fullFilenamePath)
 
             if fileSize > 8192.00:
+                if noComp == True:
+                    noFFMPEG(1)
+                    return
+
                 clear()
                 text = "Download complete. Do you wish to compress the media? (y/n)"
                 print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='\n\n')
@@ -974,6 +996,8 @@ def updateDependencies():
 
     try:
         reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+        if str(reqs) == "b''":
+            raise subprocess.CalledProcessError(1, reqs)
         installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
     except subprocess.CalledProcessError:
         import requests
@@ -981,8 +1005,9 @@ def updateDependencies():
         os.chdir(os.path.dirname(__file__))
         url = "https://bootstrap.pypa.io/get-pip.py"
         response = requests.get(url, allow_redirects=True)
+        pipFile = str(Path(os.getcwd() + r'/' + "get-pip.py"))
 
-        print("pip, python's package manager, is not installed. I will attempt to download and install it for you.\n\n")
+        print("\npip, python's package manager, is not installed. I will attempt to download and install it for you.\n")
         time.sleep(3)
 
         if not response.status_code == 200:
@@ -994,22 +1019,44 @@ def updateDependencies():
             "https://bootstrap.pypa.io/get-pip.py and execute the script. Exiting...")
             sys.exit()
         try:
-            subprocess.check_call([os.system("./get-pip.py")])
-            print("Pip should have installed without error. Please run this script again. If you keep seeing this message, you may want to try " +
+            open(pipFile, 'wb').write(response.content)
+            if platform.system() == "Linux": 
+                print("In order to install pip, a script must be executed. Due to safe guards set by your Linux distribution, I am unable to execute the " +
+                "file without changing the permissions. Changing the file permissions requires administrator access. If you do not want to provide " +
+                "administrator access, you must run the script manually via the terminal or by double clicking 'get-pip.py'.\n\nThe script is located at:", 
+                pipFile, "\n\nType 'yes' to change permissions or 'no' to exit.\n")
+                
+                userInput = input(">> ")
+
+                print()
+
+                if userInput.lower() == "yes":
+                    subprocess.call(['sudo', 'chmod', '777', 'get-pip.py'])
+                elif userInput.lower() == "no":
+                    print("\nExiting...")
+                    sys.exit()
+                else:
+                    print("\nYou have entered an invalid entry. Please execute the script again.")
+                    sys.exit()
+
+                subprocess.check_call([os.system("python3 ./get-pip.py")])
+            elif platform.system() == "Windows":
+                subprocess.check_call([os.system("python get-pip.py")])
+            print("\nPip should have installed without error. Please run this script again. If you keep seeing this message, you may want to try " +
             "adding your python installation to your PATH or read through the terminal and see if there are any errors. Exiting...")
             sys.exit()
 
-        except:
-            command = 'clear' # Unix
-            if platform.system() == "Windows": command = 'cls' # Windows
-            os.system(command)
-
-            print("An unknown error has occured. Please file a bug report at " +
-            "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report and be sure to include a copy of the terminal output.")
-            input(">>")
+        except subprocess.CalledProcessError as e:
+            print("\nAn unknown error has occured. Please file a bug report at " +
+            "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report and be sure to include a copy of the terminal output.\n\n" + str(e))
+            
+            sys.exit()
+        except TypeError as e:
+            print("\nPip should have installed without error. Please run this script again. If you keep seeing this message, you may want to try " +
+            "adding your python installation to your PATH or read through the terminal and see if there are any errors. Exiting...")
             sys.exit()
 
-    packages = ["blessed", "numpy", "python-magic", "Pillow", "youtube-dl"]
+    packages = ["blessed", "numpy", "python-magic", "Pillow", "validators", "youtube-dl"]
 
     # Turns out the library needed for magic on Windows has been out of date since 2009. These are up to date and will work with Windows 10.
     if platform.system() == "Windows":
@@ -1124,8 +1171,10 @@ from shutil import which
 
 global term
 global W,H
+global noComp
 term = blessed.Terminal()
 W,H = term.width, term.height
+noComp = False
 
 while True:
     clear()
@@ -1153,14 +1202,16 @@ while True:
             if not os.path.isfile(ffPath):
                 raise Exception()
         except Exception:
+            noComp = True
+
             clear()
             text = ["You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/ffmpeg.exe", 
             "Compression features will not work if you choose to proceed.", "Press enter to continue."]
 
             print(
-                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + text[0],
-                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
-                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + text[2]
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 2)) + text[2]
             )
             input()
     elif platform.system() == "Linux":
@@ -1168,14 +1219,16 @@ while True:
             if which("ffmpeg") is None:
                 raise Exception()
         except Exception:
+            noComp = True
+
             clear()
-            text = ["You do not have ffmpeg installed. Please make sure it is installed via your package manager or via 'sudo apt install ffmpeg''", 
-            "Compression features will not work if you choose to proceed.","Press enter to continue."]
+            text = ["You do not have ffmpeg installed. Please make sure it is installed via your package manager or via your terminal using " +
+            "'sudo apt install ffmpeg'", "Compression features will not work if you choose to proceed.","Press enter to continue."]
 
             print(
-                term.move_xy(int(W/2 - 79/2), int(H/2 - 2)) + text[0],
-                term.move_xy(int(W/2 - 59/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
-                term.move_xy(int(W/2 - 23/2), int(H/2 + 2)) + text [2]
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 2)) + text[2]
             )
             input()
 
