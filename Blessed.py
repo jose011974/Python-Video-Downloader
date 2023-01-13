@@ -464,7 +464,7 @@ def multipleURLConvert():
             term.move_xy(int(W/2 - len(text[4])/2), int(H/2 + 4)) + text[4] + "\n\n"
             )
 
-        userInput = input(">>")
+        userInput = input(">> ")
         print()
 
         if userInput.lower() == "menu":
@@ -644,19 +644,7 @@ def openUnsupportedURLs():
         print(term.move_xy(int(W/2 - (20+45)/2), int(H/2)) + term.cadetblue1 + text[0], term.normal + text[1], end='')
         countdown(5)
         return
-
-    counter = 1
-    URLCounter = 0
-    clear()
-
-    text = ["All of the URLs in 'Unsupported URLs.txt' will be opened 10 at a time.", "Press enter to continue."]
-
-    print(
-        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0],
-        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
-    )
-    input()
-
+    
     URLs = list()
     for line in fileinput.FileInput(UnsupURLTextFile,inplace=1):
         if line.rstrip():
@@ -672,6 +660,18 @@ def openUnsupportedURLs():
             term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
         )
         input()
+
+    counter = 1
+    URLCounter = 0
+    clear()
+
+    text = ["All of the URLs in 'Unsupported URLs.txt' will be opened 10 at a time.", "Press enter to continue."]
+
+    print(
+        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0],
+        term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
+    )
+    input()
 
     while True:
         if counter == len(URLs) + 1:
@@ -1000,14 +1000,37 @@ def updateDependencies():
             raise subprocess.CalledProcessError(1, reqs)
         installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
     except subprocess.CalledProcessError:
-        import requests
+        try:
+            import requests
+        except ModuleNotFoundError:
+            clear()
+            print("pip, python's package manager, is not installed on your system. I was unable to automatically install pip for you, so you must install it manually.",
+            "\n\nA web browser will open once you press enter to download the script. Please double click the script to execute it and",
+            "open this script again when it is complete.")
+
+            if platform.system() == "Windows":
+                print("\nYour system is: Windows. If you do not feel safe running a script downloaded from the internet, you must reinstall python with pip support.")
+            elif platform.system() == "Linux":
+                print("Your system is: Linux. The only way to install pip is by running the script file downloaded by the web browser.")
+            
+            print("\nPlease press enter to open a web browser and download the script. Otherwise you may exit by closing the terminal window.")
+
+            input()
+
+            webbrowser.open("https://bootstrap.pypa.io/get-pip.py", new=1)
+
+            print("A web browser should have opened. Please double click the script that downloads and pip should install without error. Open", __file__, "when pip is",
+            "installed. If you keep seeing this screen, makke sure pip is installing without error. Otherwise, file a bug report at",
+            "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report")
+            time.sleep(5)
+            sys.exit()
 
         os.chdir(os.path.dirname(__file__))
         url = "https://bootstrap.pypa.io/get-pip.py"
         response = requests.get(url, allow_redirects=True)
         pipFile = str(Path(os.getcwd() + r'/' + "get-pip.py"))
 
-        print("\npip, python's package manager, is not installed. I will attempt to download and install it for you.\n")
+        print("\npip, python's package manager, is not installed on your system. I will attempt to download and install it for you.\n")
         time.sleep(3)
 
         if not response.status_code == 200:
@@ -1056,7 +1079,7 @@ def updateDependencies():
             "adding your python installation to your PATH or read through the terminal and see if there are any errors. Exiting...")
             sys.exit()
 
-    packages = ["blessed", "numpy", "python-magic", "Pillow", "validators", "youtube-dl"]
+    packages = ["blessed", "numpy", "python-magic", "Pillow", "psutil", "requests", "validators", "youtube-dl"]
 
     # Turns out the library needed for magic on Windows has been out of date since 2009. These are up to date and will work with Windows 10.
     if platform.system() == "Windows":
@@ -1075,7 +1098,6 @@ def updateDependencies():
 
     clear()
     print("Dependencies validated.")
-    time.sleep(1)
 
 def workingDirectory():
     # Sets the directory to where media is located for multi-file operations
@@ -1158,7 +1180,25 @@ ydl_opts = {
 
 updateDependencies()
 
-import magic
+while True:
+
+    packages = ['python-magic', 'python-magic-bin']
+
+    try:
+        import magic
+        break
+    except ImportError:
+        clear()
+
+        print("For whatever reason, the libraries required for image detection were not installed. I will now attempt to remove and reinstall the packages containing",
+        "the libraries.\n")
+        time.sleep(3)
+        for p in packages:
+            subprocess.run([sys.executable, '-m', 'pip', 'uninstall', p, '-y'])
+        time.sleep(1)
+        for p in packages:
+            subprocess.run([sys.executable, '-m', 'pip', 'install', p])
+
 import psutil
 import validators
 import youtube_dl
