@@ -660,6 +660,7 @@ def openUnsupportedURLs():
             term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1]
         )
         input()
+        return
 
     counter = 1
     URLCounter = 0
