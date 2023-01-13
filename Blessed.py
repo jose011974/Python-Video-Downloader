@@ -996,34 +996,31 @@ def updateDependencies():
     print("Validating Dependency Requirements...\n")
 
     try:
+        subprocess.run(['pip3'])
+        clear()
         reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
-        if str(reqs) == "b''":
-            raise subprocess.CalledProcessError(1, reqs)
         installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
-    except subprocess.CalledProcessError:
+    except FileNotFoundError:
         try:
             import requests
         except ModuleNotFoundError:
             clear()
-            print("pip, python's package manager, is not installed on your system. I was unable to automatically install pip for you, so you must install it manually.",
-            "\n\nA web browser will open once you press enter to download the script. Please double click the script to execute it and",
-            "open this script again when it is complete.")
+            print("pip, python's package manager, is not installed on your system. I was unable to automatically install pip for you, so you must install it manually.")
 
             if platform.system() == "Windows":
-                print("\nYour system is: Windows. If you do not feel safe running a script downloaded from the internet, you must reinstall python with pip support.")
+                print("\nYour OS is: Windows.\n\nA simple way to install pip, is via a script. The script is located at:",
+                "\n\nhttps://bootstrap.pypa.io/get-pip.py",
+                "\n\nPlease copy and paste the link into your web browser of choice and download the script. If you see a large wall of text, copy and paste the code",
+                "into a text file and save it as 'get-pip.py' If you do not use the .py extension, the script will not run. Once pip is installed, run this script",
+                "again. If you encounter any issues, please go to: https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report")
             elif platform.system() == "Linux":
-                print("Your system is: Linux. The only way to install pip is by running the script file downloaded by the web browser.")
+                print("Your system is: Linux. You can use the terminal to install pip, and it is the recommended way.",
+                "\n\nUbuntu: sudo apt install python3-pip",
+                "\nCentOS/Fedora/Redhat: sudo dnf install python3",
+                "\nArch/Manjaro: sudo pacman -S python-pip",
+                "\nOpenSUSE: sudo zypper install python3-pip",
+                "\n\n If you would like to install python using a script, please press enter.")
             
-            print("\nPlease press enter to open a web browser and download the script. Otherwise you may exit by closing the terminal window.")
-
-            input()
-
-            webbrowser.open("https://bootstrap.pypa.io/get-pip.py", new=1)
-
-            print("A web browser should have opened. Please double click the script that downloads and pip should install without error. Open", __file__, "when pip is",
-            "installed. If you keep seeing this screen, makke sure pip is installing without error. Otherwise, file a bug report at",
-            "https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report")
-            time.sleep(5)
             sys.exit()
 
         os.chdir(os.path.dirname(__file__))
