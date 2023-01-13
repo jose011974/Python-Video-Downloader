@@ -991,13 +991,14 @@ def title():
     print("\n")
 
 def updateDependencies():
-
-    clear()
-    print("Validating Dependency Requirements...\n")
-
     try:
+        clear()
+        print("Checking for pip installation...\n")
+        time.sleep(1)
+
         subprocess.run(['pip3'])
         clear()
+        print("pip was sucessfuly detected... checking dependencies...\n")
         reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
         installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
     except FileNotFoundError:
@@ -1005,21 +1006,22 @@ def updateDependencies():
             import requests
         except ModuleNotFoundError:
             clear()
-            print("pip, python's package manager, is not installed on your system. I was unable to automatically install pip for you, so you must install it manually.")
+            print("I was unable to detect an installation of pip, or it is not in your system's PATH.")
 
             if platform.system() == "Windows":
-                print("\nYour OS is: Windows.\n\nA simple way to install pip, is via a script. The script is located at:",
-                "\n\nhttps://bootstrap.pypa.io/get-pip.py",
-                "\n\nPlease copy and paste the link into your web browser of choice and download the script. If you see a large wall of text, copy and paste the code",
-                "into a text file and save it as 'get-pip.py' If you do not use the .py extension, the script will not run. Once pip is installed, run this script",
-                "again. If you encounter any issues, please go to: https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report")
+                print("\nYour OS is: Windows.\n\nA simple way to install pip, is via a script. Please go to: https://bootstrap.pypa.io/get-pip.py",
+                "\n\nIf you see a large wall of text, copy and paste the code into a text file and save it as 'get-pip.py'",
+                "\n\nIf you do not use the .py extension, the script will not run. Once pip is installed, run this script again.",
+                "\n\nIf you encounter any issues, please go to: https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report\n")
             elif platform.system() == "Linux":
                 print("Your system is: Linux. You can use the terminal to install pip, and it is the recommended way.",
                 "\n\nUbuntu: sudo apt install python3-pip",
                 "\nCentOS/Fedora/Redhat: sudo dnf install python3",
                 "\nArch/Manjaro: sudo pacman -S python-pip",
                 "\nOpenSUSE: sudo zypper install python3-pip",
-                "\n\n If you would like to install python using a script, please press enter.")
+                "\n\n If you would like to install pip using a script, please go to https://bootstrap.pypa.io/get-pip.py\n")
+            
+            input("Press enter to exit.")
             
             sys.exit()
 
@@ -1189,7 +1191,8 @@ while True:
         clear()
 
         print("For whatever reason, the libraries required for image detection were not installed. I will now attempt to remove and reinstall the packages containing",
-        "the libraries.\n")
+        "the libraries. Please don't bug me for a fix, this has never happened before and I don't even know what's causing it.\n\nIf you keep seeing this text after",
+        "a minute has passed, you may want to try using another program untill I find a fix.")
         time.sleep(3)
         for p in packages:
             subprocess.run([sys.executable, '-m', 'pip', 'uninstall', p, '-y'])
@@ -1243,15 +1246,17 @@ while True:
             noComp = True
 
             clear()
-            text = ["You do not have ffmpeg installed. Please make sure it is installed in C:/ffmpeg/ffmpeg.exe", 
-            "Compression features will not work if you choose to proceed.", "Press enter to continue."]
+            text = ["You do not have ffmpeg installed. Please make sure it is installed at C:\\ffmpeg\\ffmpeg.exe.",
+            "Compression features will not work if you choose to proceed.", "You can download ffmpeg from: https://ffmpeg.org/download.html", "Press enter to continue."]
 
             print(
-                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
-                term.move_xy(int(W/2 - len(text[1])/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
-                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 2)) + text[2]
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 - 1)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 1)) + text[2],
+                term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 3)) + text[3]
             )
             input()
+
     elif platform.system() == "Linux":
         try:
             if which("ffmpeg") is None:
@@ -1260,13 +1265,14 @@ while True:
             noComp = True
 
             clear()
-            text = ["You do not have ffmpeg installed. Please make sure it is installed via your package manager or via your terminal using " +
-            "'sudo apt install ffmpeg'", "Compression features will not work if you choose to proceed.","Press enter to continue."]
+            text = ["You do not have ffmpeg installed. Please make sure it is installed via your package manager or via your terminal with help from Google.",
+            "Compression features will not work if you choose to proceed.", "You can also download ffmpeg from: https://ffmpeg.org/download.html", "Press enter to continue."]
 
             print(
-                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
-                term.move_xy(int(W/2 - len(text[1])/2), int(H/2)) + term.bold + term.orangered + text[1] + term.normal,
-                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 2)) + text[2]
+                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
+                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 - 1)) + term.bold + term.orangered + text[1] + term.normal,
+                term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 1)) + text[2],
+                term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 3)) + text[3]
             )
             input()
 
