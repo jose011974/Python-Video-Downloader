@@ -177,3 +177,5 @@ The main menu and the available options are shown below:
 	- This creates an H.264 MP4 file with moderate quality that is compatible with many devices.
 
 In the future, an option will be implimented that can cut a media file into 10 second clips and stitch them back into one video.
+
+# Troubleshooting
