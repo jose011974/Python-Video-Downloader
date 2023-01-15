@@ -49,9 +49,7 @@ The script will automatically grab the required libraries. In the event this doe
 - youtube_dl - Used to download media from various websites using extractors. [Learn More](https://github.com/ytdl-org/youtube-dl "Learn More")
 ------------
 
-# Usage
-
-**Use at your own risk!**
+# Video Tutorial
 
 Video Tutorial: TBD
 
