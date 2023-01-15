@@ -115,7 +115,7 @@ You do not need administrator permissions to install Python or set up the PATH e
 3. Run the script
 
 **Windows 10/11 Instructions**:
-- Assuming the defaults were selected, double click `Python Video Downloader.py` to launch the script. If you have extensions disabled, you may only see `Python Video Downloader.py`
+- Assuming the defaults were selected, double click `Python Video Downloader.py` to launch the script. If you have extensions disabled, you may only see `Python Video Downloader`
 
 **Linux Instructions**:
 - In order to allow the script to be executed with a double click gesture, you must right click and allow the script to be executed. This WILL differ depending on your file manager.
@@ -124,6 +124,7 @@ You do not need administrator permissions to install Python or set up the PATH e
 	- You can also run the script via the terminal with the following: `python3 ./'Python Video Downloader.py'`
 
 **The following will be checked once the script launches:**
+
 	- pip installation
 	- The presence of required packages
 	- The presence of ffmpeg
