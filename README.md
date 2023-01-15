@@ -92,6 +92,7 @@ Video Tutorial: TBD
 *Linux users go to step 3*
 
 1.  Download Python using the link above, then install using the defaults, with the checkbox labeled "Add Python to PATH" checked. 
+
 You do not need administrator permissions to install Python or set up the PATH environment variables.
 
 ![Python Installation Parameters](https://i.imgur.com/P58jdP6.png "Python Installation Parameters")
