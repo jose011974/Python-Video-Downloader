@@ -104,8 +104,6 @@ You do not need administrator permissions to install Python or set up the PATH e
 	
 - The full path should be 'C:\ffmpeg\ffmpeg.exe
 
-3. Download the Microsoft Visual C++ 2010 Service Pack 1 RP (x86) using the link above and install it normally.
-
 ### Step 3 - Obtain Python Video Downloader
 
 - Once you have completed Steps 1 & 2, you may now download the script. [Click here](https://github.com/jose011974/Python-Video-Downloader/releases "Click here") to download the latest release.
