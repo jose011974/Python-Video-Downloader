@@ -179,3 +179,28 @@ The main menu and the available options are shown below:
 In the future, an option will be implimented that can cut a media file into 10 second clips and stitch them back into one video.
 
 # Troubleshooting
+
+TODO
+
+# Credits
+
+This script was created in thanks to:
+
+- Twitter not adding a download button to tweets
+- Discord not allowing regular members to upload files larger than 8 MB without paying:
+	- $3 a month or $30 a year for a 50 MB cap 
+	- $10 a month or $100 a year for a 500 MB cap
+
+This script has been in the works since July of 2022.
+- First version used MoviePy and had basic error checking.
+- Second version used ffmpeg instead and had improved handling of errors
+- Third version (current) still uses ffmpeg but now incorporates the Blessed library for visual effects and vastly improves on everything from compression to error handling.
+
+This script was created with:
+- Visual Studio Code
+- Windows Subsystems for Linux
+- VirtualBox - Used for testing on clean installs of Windows & Ubuntu/KDE Neon
+- Sublime Text 4
+- Lots of late nights, frustration filled days, drinking caffinated beverages, and pain.
+
+If you would like to make any changes, please credit me as the original author and do not sell anything included with this repository.
