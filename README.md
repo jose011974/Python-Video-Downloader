@@ -9,6 +9,8 @@ For example:
 - This script will look inside of ALL sub-directories from the script path. So it is recommended to run this script inside its own folder, and leave the output folder empty once you are finished using the program.
 - This script does not have a check for reading of "SPOILER" as a prefix to the file when doing a spoil command.
 	- The same applies for "non-spoling".
+	
+This readme is a work in progress, create an issue if you are experiencing problems.
 
 ------------
 
