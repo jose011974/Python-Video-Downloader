@@ -131,7 +131,7 @@ You do not need administrator permissions to install Python or set up the PATH e
 
 Assuming everything was installed and works correctly, congration! You are now a proud operator of Python Video Downloader!
 
-If you have any issues, please go to the troubleshooting[link goes here] section.
+If you have any issues, please go to the [troubleshooting](https://github.com/jose011974/Python-Video-Downloader/blob/main/README.md#troubleshooting "troubleshooting") section.
 
 ### Using Python Video Downloader
 
