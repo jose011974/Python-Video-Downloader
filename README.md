@@ -87,7 +87,7 @@ Video Tutorial: TBD
 			- Arch: `pacman -S ffmpeg`
 			- openSUSE: [Click here for the latest build](https://software.opensuse.org/package/ffmpeg "Click here for the latest build")
 
-### Step 2 - Install Prerequisites - WINDOWS 10/11 ONLY!
+### Step 2 - Install Prerequisites - Windows 10/11 ONLY!
 
 *Linux users go to step 3*
 
