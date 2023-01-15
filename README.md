@@ -92,14 +92,15 @@ Video Tutorial: TBD
 *Linux users go to step 3*
 
 1.  Download Python using the link above, then install using the defaults, with the checkbox labeled "Add Python to PATH" checked. 
-
 You do not need administrator permissions to install Python or set up the PATH environment variables.
 
 ![Python Installation Parameters](https://i.imgur.com/P58jdP6.png "Python Installation Parameters")
 
 2. Once Python is installed, download ffmpeg and create a folder on your C:\ directory called 'ffmpeg'
 	
-Using a program such as 7-Zip or Winrar, extract ffmpeg.exe to 'C:\ffmpeg\' You only need ffmpeg.exe for the script to function.
+Using a program such as 7-Zip or Winrar, extract ffmpeg.exe to 'C:\ffmpeg\' 
+
+You only need ffmpeg.exe for the script to function.
 	
 The full path should be 'C:\ffmpeg\ffmpeg.exe
 
