@@ -50,7 +50,6 @@ The script will automatically grab the required libraries. In the event this doe
 ------------
 
 # Usage
-It is **HIGHLY** recommended to run this script in an empty folder. I am not responsible for **ANY** data loss caused by improper use of this script.
 
 **Use at your own risk!**
 
@@ -58,29 +57,37 @@ Video Tutorial: TBD
 
 ------------
 
+# Text Tutorial
+
 ### Step 1 - Download Prerequisites
 
 - Download the prerequisites listed above:
 	- [Python](https://www.python.org/downloads/ "Python")
-		- **Windows 10/11:**
-			- Download the setup executable and install using the default options. 
-			- You **MUST** check the box that says "Add python to PATH" or pip will fail to install and prevent the script from downloading and updating packages. You do not need administrator permissions for this step.
 		- **Linux:**
 			- Most Linux distributions include python by default. You can install python via your package manager or terminal. Google is your friend for any distributions not listed here.
 			- Ubuntu/Debian/KDE Neon: `sudo apt install python3`
+			- Fedora: `sudo dnf install python3`
+			- Arch: `sudo pacman -Sy python-pip` (installs both python and pip)
+			- openSUSE: [Click here for the latest builds](https://software.opensuse.org/package/python3 "Click here for the latest builds")
 	- [PIP](https://bootstrap.pypa.io/get-pip.py "PIP")
 		- **Windows 10/11:**
 			- You can install pip via the python installer or through the script linked [here](https://bootstrap.pypa.io/get-pip.py "here")
 		- **Linux:**
-			- You can install pip using the script linked [here](https://bootstrap.pypa.io/get-pip.py "here") via your package manager, or via the terminal. Google is your friend for any distributions not listed here.
-			- Ubuntu/Debian/KDE Neon: `sudo apt install python3`
+			- You can install pip using the script linked [here](https://bootstrap.pypa.io/get-pip.py "here"), via your package manager, or via the terminal. Google is your friend for any distributions not listed here.
+			- Ubuntu/Debian/KDE Neon: `sudo apt install python3-pip`
+			- Fedora: `sudo dnf install python3-pip`
+			- Arch: `pacman -S python-pip`
+			- openSUSE: [Click here for the latest build](https://software.opensuse.org/package/python-pip "Click here for the latest build")
 		
 	- [ffmpeg](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z "ffmpeg")
 		- **Windows 10/11:**
-			- Extract the .7z file and place ffmpeg.exe at `C:\ffmpeg`
+			- Extract the .7z file (using 7-zip or Winrar) and place ffmpeg.exe at `C:\ffmpeg`
 		- **Linux:**
 			 - You can install ffmpeg via your package manager, the link above, or via the terminal. Google is your friend here.
 			 - Ubuntu/Debian/KDE Neon: `sudo apt install ffmpeg`
+			- Fedora: `sudo dnf install ffmpeg`
+			- Arch: `pacman -S ffmpeg`
+			- openSUSE: [Click here for the latest build](https://software.opensuse.org/package/ffmpeg "Click here for the latest build")
 
 ### Step 2 - Install Prerequisites - WINDOWS 10/11 ONLY!
 
@@ -141,7 +148,7 @@ The main menu and the available options are shown below:
 	- This option will create a folder called `output` in the running directory and place the file inside `output`
 - **Option 4: Download and compress multiple files from the internet**
 	- This option uses a text file called `URL.txt` at the script directory to grab multiple URI.
-	- This option will create a folder called `output` in the running directory and place the file inside `output`
+	- This option will create a folder called `output` in the running directory and place the files inside `output`
 - **Option 5: Appends `SPOILER_` to the prefix of the file name in order to send media behind a spoiler tag on Discord**.
 	- WARNING: THIS WILL SCAN *ALL* SUB DIRECTORES! IT IS RECOMMENDED TO PLACE THE IMAGES YOU WISH TO COMPRESS INTO A STANDALONE FOLDER.
 - **Option 6: Removes the `SPOILER_` tag from the prefix of a file name.**
@@ -153,3 +160,20 @@ The main menu and the available options are shown below:
 ### Extra Notes:
 - Only files above 8 MB will be compressed. This is because Discord wants money apparently.
 - Only `jpg/jpeg, png, gif, mp4, and webm` files have been tested. In order to maintain compatabilty with all devices out there, the output file will be an `.mp4` file. The original file will not be deleted and instead have `old_` appended to the prefix of the file name.
+
+### More information on how the Downloading and Compressing features work
+
+`Python Video Downloader` uses youtube-dl for downloading media from the internet.
+- In summary, youtube-dl will try to use an extractor to grab the media url and download it with the highest quality possible.
+- If an extractor is not available, then a generic extractor is used and results will vary if the generic extractor is used.
+	- This may result in a URL not being accessable and the script throwing an error message.
+
+
+------------
+
+`Python Video Downloader` uses ffmpeg to compress media.
+
+- Here is the parameter used in `Python Video Downloader`: `-c:v libx264 -crf 23 -pix_fmt yuv420p`
+	- This creates an H.264 MP4 file with moderate quality that is compatible with many devices.
+
+In the future, an option will be implimented that can cut a media file into 10 second clips and stitch them back into one video.
