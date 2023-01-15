@@ -98,11 +98,11 @@ You do not need administrator permissions to install Python or set up the PATH e
 
 2. Once Python is installed, download ffmpeg and create a folder on your C:\ directory called 'ffmpeg'
 	
-Using a program such as 7-Zip or Winrar, extract ffmpeg.exe to 'C:\ffmpeg\' 
+- Using a program such as 7-Zip or Winrar, extract ffmpeg.exe to 'C:\ffmpeg\' 
 
-You only need ffmpeg.exe for the script to function.
+- You only need ffmpeg.exe for the script to function.
 	
-The full path should be 'C:\ffmpeg\ffmpeg.exe
+- The full path should be 'C:\ffmpeg\ffmpeg.exe
 
 3. Download the Microsoft Visual C++ 2010 Service Pack 1 RP (x86) using the link above and install it normally.
 
