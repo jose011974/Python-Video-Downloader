@@ -1,4 +1,4 @@
-# **THIS BRANCH IS FOR RE-WRITING THE SCRIPT USING THE BLESSED LIBRARY. DO NOT USE THIS VERSION AS I AM SLOWLY IMPLEMENTING THE FEATURES AND SQUASHING ANY BUGS. USE THE MAIN BRANCH INSTEAD**
+# EDIT 1/15/2023: This branch is no longer being updated. Please use the main branch instead. This branch is being kept open for archival purposes
 
 I have no idea how to use Github. Please forgive me.
 
