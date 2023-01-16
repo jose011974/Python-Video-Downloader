@@ -127,24 +127,20 @@ def countStrings(text):
 
     return num
 
-def errorHandler(origError, uri):
-    
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    error = ansi_escape.sub('', origError)
-
-    error = error[7:]
+def errorHandler(error, uri):
     # I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
     # I strip out the trash and leave the error message behind, then I detect the error message and assign an error code.
 
     counter = -1
     errorNumber = -1
     errorMessage = ""
+    error = error[7:]
 
     # Iterate over the error message
     for element in error:
         counter = counter + 1
-        if element == ";": 
-            errorMessage = error[:counter]
+        if element == ":": 
+            errorMessage = error[counter + 2:]
             break
 
     if errorMessage == "":
@@ -152,12 +148,8 @@ def errorHandler(origError, uri):
     
     # Check the error code and assign an error code to it
 
-    if errorMessage == "There's no video in this tweet." or "Unable to extract video url": 
+    if errorMessage == "No video could be found in this tweet": 
         errorNumber = 1
-    elif errorMessage == "Unsupported URL: " + uri:
-        errorNumber = 2
-    elif errorMessage == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>)":
-        errorNumber = 3
     else:
         errorNumber = 0
     
@@ -171,30 +163,17 @@ def errorHandler(origError, uri):
     elif errorNumber == 1:
         clear()
 
-        print(term.brown1 + "ERROR 1:" + term.normal, "Youtube-DL was unable to find a valid media source. Try again with a direct link to the media source, instead of the hosted page.\n")
-        print("You can try right clicking the media and click 'Copy Video/Image Address'. Otherwise you will have to use the ", end='')
-        print("Inspect Element tool (F12). If you are still getting this error, that URL is not supported. Check the", 
-        term.link("https://github.com/jose011974/Download-Compress-Media","GitHub"), "page for more information on supported URLs.\n")
-        print("URL:", uri)
-
-    elif errorNumber == 2:
-        clear()
-
-        print(term.brown1 + "ERROR 2:" + term.normal, "Youtube-DL was unable to download the media. Please try the direct link to the media instead.\n")
-        print("URL:", uri)
-
-    elif errorNumber == 3:
-        clear()
-
-        print(term.brown1 + "ERROR 3:" + term.normal, "The URL was not accessable. Please make sure the link is accessable through a browser. If it is, then submit an issue on the Github\n")
-        print("URL:", uri)
+        print(term.brown1 + "ERROR 1:" + term.normal, "yt-dlp was unable to find a valid video source from the tweet provided. If the tweet is accessible, then make sure the tweet",
+        "is not from a private account or a tweet with an image.\n\nFor whatever reason, yt-dlp does not include support for downloading images directly from twitter. If this is",
+        "the case, then please provide the direct link to the image by right clicking the image in question and selecting 'Copy Image Address' or 'Copy Image Link'")
+        print("\nURL:", uri)
         
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
 
     userInput = input(">>")
 
     if userInput.lower() == "suppress":
-        return "suppress"
+        return userInput.lower()
     
     clear()
 
