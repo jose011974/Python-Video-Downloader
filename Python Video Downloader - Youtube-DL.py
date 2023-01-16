@@ -1,8 +1,14 @@
-# You can ignore these, I kept forgeting the syntax for the colors and centering text.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-# term.cadetblue1
-# term.brown1
-# term.move_xy(int(W/2 - len(text variable goes here)/2), int(H/2))
+"""
+    Project Name: Python Video Downloader with Youtube-DL support
+    Date of Creation: 08/21/2022 (roughly)
+    Last Updated: 1/15/2023
+    Python Version: 3.10.4 (supports 3.7+)
+    Version: 1.0
+"""
+
 
 import fileinput
 import os
@@ -1168,10 +1174,8 @@ class MyLogger(object):
 def downloadStatus(d):
     if d['status'] == 'finished': # Download status complete
         global downFileName
-        origFileName = d['filename']
-
+        downFileName = d['filename']
         print("\nDownloading complete.\n")
-        downFileName = origFileName.encode('ascii','ignore').decode('ascii')
 
 
 # Parameters for Youtube-DL.
@@ -1207,11 +1211,11 @@ while True:
         for p in packages:
             subprocess.run([sys.executable, '-m', 'pip', 'install', p])
 
+import blessed
+import datetime
 import psutil
 import validators
 import youtube_dl
-import blessed
-import datetime
 
 from numpy import char
 from PIL import Image
@@ -1282,5 +1286,4 @@ while True:
                 term.move_xy(int(W/2 - len(text[3])/2), int(H/2 + 3)) + text[3]
             )
             input()
-
     main()
