@@ -1,3 +1,5 @@
+# It is not recommended to use this version. Use the yt-dlp version instead.
+
 # Important Notes!
 
 It is imperative that you understand that I am **NOT** responsible for any data loss that **will** occur if you do not take into account the quirks of this script.

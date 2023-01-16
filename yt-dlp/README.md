@@ -48,7 +48,7 @@ The script will automatically grab the required libraries. In the event this doe
 - psutil - Used for processes and system utilities (used to terminate ffmpeg processes in the event they are frozen)
 - requests - Used to create HTTP requests
 - validators - Used to validate data types (emails, links, etc.)
-- youtube_dl - Used to download media from various websites using extractors. [Learn More](https://github.com/ytdl-org/youtube-dl "Learn More")
+- yt-dlp - Used to download media from various websites using extractors. [Learn More](https://github.com/yt-dlp/yt-dlp "Learn More")
 ------------
 
 # Video Tutorial
@@ -165,8 +165,8 @@ The main menu and the available options are shown below:
 
 ### More information on how the Downloading and Compressing features work
 
-`Python Video Downloader` uses youtube-dl for downloading media from the internet.
-- In summary, youtube-dl will try to use an extractor to grab the media url and download it with the highest quality possible.
+`Python Video Downloader` uses yt-dlp for downloading media from the internet.
+- In summary, yt-dlp will try to use an extractor to grab the media url and download it with the highest quality possible.
 - If an extractor is not available, then a generic extractor is used and results will vary if the generic extractor is used.
 	- This may result in a URL not being accessable and the script throwing an error message.
 
