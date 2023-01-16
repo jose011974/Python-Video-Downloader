@@ -818,7 +818,7 @@ def singleURLConvert():
                 # Download the media file
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
-                    time.sleep(0.3)
+                    time.sleep(0.4)
                     
             except:
                 errorHandler(errorMessage, uri)
