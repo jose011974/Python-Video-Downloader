@@ -479,7 +479,7 @@ def multipleURLConvert():
             for uriLine in URIList:
                 uri = uriLine.rstrip()
                 if validators.url(uri):
-                    text = ["URI Found:", "[Youtube-DL]"]
+                    text = ["URI Found:", "[yt-dlp]"]
                     
                     clear()
                     print(
@@ -810,7 +810,7 @@ def singleURLConvert():
             print(term.brown1 + "The URL is not valid. Please check the syntax and try again.", term.normal, end='\n\n')
         else:
             clear()
-            text = ["URI found:", uri, "| Downloading...", "[Youtube-DL]"]
+            text = ["URI found:", uri, "| Downloading...", "[yt-dlp]"]
             num = countStrings(text)
             print(term.move_xy(int(W/2 - num/2), int(H/2)), text[0], term.cadetblue1 + text[1], term.normal + text[2], "\n\n" + text[3])
 
@@ -818,6 +818,7 @@ def singleURLConvert():
                 # Download the media file
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
+                    time.sleep(0.3)
                     
             except:
                 errorHandler(errorMessage, uri)
