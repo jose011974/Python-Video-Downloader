@@ -85,7 +85,7 @@ def convert(filename, filenamePath):
     if ext[1] == ".gif" or ext[1] == ".webm" or ext[1] == ".mp4":
         # Setup paths and codec options
         outputFile = str(Path(outputPath + r'/' + os.path.basename(ext[0]) + ".mp4"))
-        codec = "-c:v libx264 -crf 28 -pix_fmt yuv420p"
+        codec = "-c:v libx264 -crf 23 -pix_fmt yuv420p"
 
         # Begin Conversion
         if platform.system() == "Windows":
@@ -1021,12 +1021,12 @@ def updateDependencies():
                 "\n\nIf you do not use the .py extension, the script will not run. Once pip is installed, run this script again.",
                 "\n\nIf you encounter any issues, please go to: https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report\n")
             elif platform.system() == "Linux":
-                print("Your system is: Linux. You can use the terminal to install pip, and it is the recommended way.",
+                print("\nYour system is: Linux.\n\nThe recommended way to install pip is via your terminal. You can find common commands below:",
                 "\n\nUbuntu: sudo apt install python3-pip",
                 "\nCentOS/Fedora/Redhat: sudo dnf install python3",
                 "\nArch/Manjaro: sudo pacman -S python-pip",
                 "\nOpenSUSE: sudo zypper install python3-pip",
-                "\n\n If you would like to install pip using a script, please go to https://bootstrap.pypa.io/get-pip.py\n")
+                "\n\nIf you would like to install pip using a script, please go to https://bootstrap.pypa.io/get-pip.py\n")
             
             input("Press enter to exit.")
             
@@ -1199,7 +1199,7 @@ while True:
 
         print("For whatever reason, the libraries required for image detection were not installed. I will now attempt to remove and reinstall the packages containing",
         "the libraries. Please don't bug me for a fix, this has never happened before and I don't even know what's causing it.\n\nIf you keep seeing this text after",
-        "a minute has passed, you may want to try using another program untill I find a fix.")
+        "a minute has passed, you may want to try using another program until I find a fix.")
         time.sleep(3)
         for p in packages:
             subprocess.run([sys.executable, '-m', 'pip', 'uninstall', p, '-y'])
