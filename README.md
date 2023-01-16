@@ -1,5 +1,11 @@
 # EDIT 1/15/2023: This branch is no longer being updated. Please use the main branch instead. This branch is being kept open for archival purposes
 
+## This project used to be called Download Compress Media, however since 2023 it has been renamed to Python Video Downloader
+
+-------
+
+# ORIGINAL README
+
 I have no idea how to use Github. Please forgive me.
 
 ***There are still a few ~~minor~~ **MAJOR** bugs***
