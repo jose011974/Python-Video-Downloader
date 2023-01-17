@@ -9,7 +9,6 @@
     Version: 1.0
 """
 
-
 import fileinput
 import os
 import platform
@@ -22,8 +21,9 @@ import webbrowser
 
 from pathlib import Path
 
-fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"]
+fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"] # Used to filter out non-media files
 
+# Create a folder to move completed files to as to not clog up the script directory
 def createOutputFolder(currentDir):
     outputDir = str(Path(currentDir + r'/output'))
     boolVal = True
@@ -36,6 +36,7 @@ def createOutputFolder(currentDir):
             else:
                 boolVal = False
         
+        # No permissions
         except PermissionError:
             clear()
             print(term.brown1 + "Error: Missing required permissions. Please make sure you have read and write access to" + term.normal +
@@ -59,7 +60,7 @@ def clear():
     title()
 
 def checkIfProcessRunning(processName):
-    # For whatever reason, sometimes a video conversion process is stalled. This function kills any and all ffmpeg processes as you cannot move a file
+    # For whatever reason, a video conversion process may stall. This function kills any and all ffmpeg processes as you cannot move a file
     # that is in use by a process.
 
     # Iterate over the all the running process
@@ -71,17 +72,19 @@ def checkIfProcessRunning(processName):
                 p = psutil.Process(proc.pid)
                 p.terminate()
                 return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess): # Uh oh.
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return False
 
 def convert(filename, filenamePath):
-    outputPath = str(Path(filenamePath + r'/output')) # Output path
-    outputFile = str(Path(outputPath + r'/' + filename)) # Output file
-    inputFile = str(Path(filenamePath + r'/' + filename)) # Input file
-    ext = os.path.splitext(filename) # Extension
+    outputPath = str(Path(filenamePath + r'/output'))
+    outputFile = str(Path(outputPath + r'/' + filename))
+    inputFile = str(Path(filenamePath + r'/' + filename))
+    ext = os.path.splitext(filename)
     codec = ""
     
+    # Show the time compression started.
+    clear()
     now = datetime.datetime.now()
     text = ["Processing", "Time the Process started: " + now.strftime('%I:%M %p')]
     print(
@@ -93,13 +96,14 @@ def convert(filename, filenamePath):
         outputFile = str(Path(outputPath + r'/' + os.path.basename(ext[0]) + ".mp4"))
         codec = "-c:v libx264 -crf 23 -pix_fmt yuv420p"
 
-        # Begin Conversion
+        # Begin compression
         if platform.system() == "Windows":
             ffPath = "C:/ffmpeg/ffmpeg.exe"
             os.system(ffPath + ' -i "' + inputFile + '" ' + codec + ' "' + outputFile + '"') # Windows
         else:
             os.system("ffmpeg" + ' -i "' + inputFile + '" ' + codec + ' "' + outputFile + '"') # Linux / Other OS
 
+    # Compress images
     elif ext[1] == ".jpg":
         im = Image.open(inputFile)
         im.save(outputFile, optimize=True, quality="keep")
@@ -110,6 +114,7 @@ def convert(filename, filenamePath):
     return outputFile
 
 def countdown(i):
+    # Print a countdown timer.
     curLocation = term.get_location()
     W = curLocation[1]
     H = curLocation[0]
@@ -120,6 +125,7 @@ def countdown(i):
         i = i - 1
 
 def countStrings(text):
+    # Counts strings in a list.
     num = 0
     res = char.str_len(text)
     for ele in res:
@@ -128,11 +134,11 @@ def countStrings(text):
     return num
 
 def errorHandler(error, uri):
-    # I have no idea how to create a proper error handler without making my own version of youtube-dl. So this is the next best solution.
-    # I strip out the trash and leave the error message behind, then I detect the error message and assign an error code.
+    # yt-dlp provides a more sophisicated error handler. 
+    # This function strips out the first 8 characters of the error, then iterates through the error till a : is found, at which point the remaining string is
+    # compared to a list of pre-defined error messages, and the appropriate explination of why the error occured is shown to the user.
 
     counter = -1
-    errorNumber = -1
     errorMessage = ""
     error = error[7:]
 
@@ -142,31 +148,28 @@ def errorHandler(error, uri):
         if element == ":": 
             errorMessage = error[counter + 2:]
             break
+    
+    # Compare the error to a list of pre-determined error messages and print an explanation of the error to the screen.
 
+    clear()
+    
     if errorMessage == "":
-        errorMessage = error
-    
-    # Check the error code and assign an error code to it
-
-    if errorMessage == "No video could be found in this tweet": 
-        errorNumber = 1
-    else:
-        errorNumber = 0
-    
-    if errorNumber == 0:
-        clear()
-
         print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
         print("include the URL and error message found below in your issue:\n")
         print(uri, "\n")
         print(error)
-    elif errorNumber == 1:
-        clear()
-
+    elif errorMessage == "No video could be found in this tweet": 
         print(term.brown1 + "ERROR 1:" + term.normal, "yt-dlp was unable to find a valid video source from the tweet provided. If the tweet is accessible, then make sure the tweet",
         "is not from a private account or a tweet with an image.\n\nFor whatever reason, yt-dlp does not include support for downloading images directly from twitter. If this is",
         "the case, then please provide the direct link to the image by right clicking the image in question and selecting 'Copy Image Address' or 'Copy Image Link'")
         print("\nURL:", uri)
+    elif errorMessage == "Error(s) while querying API: User has been suspended.":
+        print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended. I am unable to download this tweet.")
+        print("\nURL:", uri)
+    elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
+        print(term.brown1 + "ERROR 404:" + term.normal, "The URL was unable to be accessed. Please make sure that you can access the URL through a web browser. If you can,",
+        "then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
+
         
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
 
@@ -179,32 +182,36 @@ def errorHandler(error, uri):
 
 def getFileExtension(filename):
 
-    fileMIME = magic.from_file(filename, mime=True) # Identify the file type
+    # Identify file type. You cannot just rely on the extension alone.
+
+    fileMIME = magic.from_file(filename, mime=True)
     fileMIME = fileMIME[6:len(fileMIME)]
     fileExt = os.path.splitext(filename)
 
     return fileExt[1], fileMIME
 
 def getFileSize(file):
-    fileSize = os.path.getsize(file) # Get the size of a file
-    fileSize = float("{:.2f}".format(fileSize / 1024)) # Convert the output from bytes to MB
+    # Get the file size and convert to MB
+
+    fileSize = os.path.getsize(file)
+    fileSize = float("{:.2f}".format(fileSize / 1024))
 
     return fileSize
 
 def getListOfFiles(dirName):
     os.chdir(os.path.dirname(__file__))
     folderPath = os.getcwd()
-    oldOutPath = str(Path(folderPath + r'/' + "output_old"))
+    outPath = str(Path(folderPath + r'/' + "output"))
     global folderCounter
     folderCounter = 0
-    # create a list of file and sub directories 
-    # names in the given directory 
+    # Create a list of file and sub directories 
+    # Names in the given directory 
     listOfFile = os.listdir(dirName)
     allFiles = list()
     # Iterate over all the entries
     for entry in listOfFile:
         # Create full path
-        if dirName == oldOutPath:
+        if dirName.lower() == outPath.lower():
             folderCounter = folderCounter + 1
             return list()
         fullPath = os.path.join(dirName, entry)
@@ -295,41 +302,13 @@ def main():
             continue
 
 def multipleFileConvert():
+    # Set-up paths
+
     mediaPath = str(Path(workingDirectory()))
     outputPath = str(Path(mediaPath + r'/output'))
-    oldOutPath = str(Path(mediaPath + r'/output_old'))
 
-    if os.path.exists(outputPath):
-        files = getListOfFiles(outputPath)
-        if len(files) != 0:
-            clear()
-
-            text = ["A folder named 'output' has been detected. For compatability reasons, the folder must be renamed to 'output_old'.", 
-            "Do you wish to proceed? (y/n)"]
-
-            print(term.move_xy(int(W/2 - countStrings(text)/2), int(H/2)) + text[0], text[1], "\n\n")
-            userInput = input(">>")
-
-            if userInput.lower() == "n":
-                return
-            elif userInput.lower() == "y":
-                try:
-                    os.rename(outputPath, oldOutPath)
-                    os.mkdir(outputPath)
-                except FileExistsError:
-                    clear()
-
-                    text = ["A folder named 'output_old' exists. You must rename it in order to preserve data you may want.", "Press enter to continue."]
-
-                    print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + term.brown1 + text[0] + term.normal, end='')
-                    countdown(3)
-                    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1], end='')
-                    
-                    input()
-                    return
-    else:
-        if not os.path.isdir(outputPath):
-            os.mkdir(outputPath)
+    if not os.path.isdir(outputPath):
+        os.mkdir(outputPath)
     
     if mediaPath == "menu":
         clear()
@@ -590,8 +569,6 @@ def multipleURLConvert():
             term.move_xy(int(W/2 - (len(text[1]) + len(outputPath))/2), int(H/2 - 1)) + term.palegreen + text[1], term.cadetblue1 + outputPath + term.normal, end=''
             )
 
-        
-
         if len(UnhandledURLs) > 0:
 
             unsupportedURL = open("Unsupported URLs.txt", "w")
@@ -604,11 +581,9 @@ def multipleURLConvert():
                 term.move_xy(int(W/2 - (len(text[0]) + len(mediaPath) + len(text[1]))/2), int(H/2 + 1)) + term.palegreen + text[0] + term.cadetblue1  + ":", 
                 mediaPath + text[1] + term.normal, end=''
                 )
-            countdown(5)
             print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
             input()
 
-        countdown(5)
         print(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
         input()
 
