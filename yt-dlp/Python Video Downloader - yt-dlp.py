@@ -307,18 +307,17 @@ def multipleFileConvert():
     mediaPath = str(Path(workingDirectory()))
     outputPath = str(Path(mediaPath + r'/output'))
 
-    if not os.path.isdir(outputPath):
-        os.mkdir(outputPath)
-    
     if mediaPath == "menu":
         clear()
         return
+
+    createOutputFolder(mediaPath)
 
     clear()
     text = "Counting files..."
     print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text)
 
-    filePathList = getListOfFiles(mediaPath)
+    filePathList = getListOfFiles(mediaPath) # Grab files from the path provided by the user
     totalFiles = len(filePathList)
     currentPos = 0
     
@@ -337,8 +336,8 @@ def multipleFileConvert():
         fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
         filename = os.path.basename(fullFilePath)
         filePath = os.path.dirname(fullFilePath)
-        oldConvFile = str(Path(outputPath + r'/old_' + filename)) # old Output file path
-        convFile = str(Path(outputPath + r'/' + filename)) # Output file path
+        oldConvFile = str(Path(outputPath + r'/old_' + filename))
+        convFile = str(Path(outputPath + r'/' + filename))
 
         if os.path.isfile(fullFilePath):
             if getFileSize(fullFilePath) > 8192.00:
@@ -346,7 +345,6 @@ def multipleFileConvert():
                     text2 = " | " + str(getFileSize(fullFilePath)) + " MB | File " + str(currentPos) + " of " + str(totalFiles) + "\n"
                     print(term.move_xy(int(W/2 - (len(text) + len(filename) + len(text2))/2), int(H/2 - 2)) + text + 
                     term.cadetblue1 + filename + term.normal + text2)
-                    # print("\nCompressing " + term.cadetblue1 + filename + term.normal + " | " + str(getFileSize(fullFilePath)) + " MB | File " + str(currentPos) + " of " + str(totalFiles) + "\n")
                     convert(filename, filePath)
                     shutil.copy(fullFilePath, oldConvFile)
                     os.remove(fullFilePath)
@@ -376,40 +374,11 @@ def multipleURLConvert():
     notFile = True
     mediaPath = os.getcwd()
     outputPath = str(Path(mediaPath + r'/output'))
-    oldOutPath = str(Path(mediaPath + r'/output_old'))
     UnhandledURLs = list()
     URIList = list()
     largeFileCount = 0
     currentPos = 1
-
-    if os.path.exists(outputPath):
-        files = getListOfFiles(outputPath)
-        if len(files) != 0:
-            clear()
-
-            text = ["A folder named 'output' has been detected. For compatability reasons, the folder must be renamed to 'output_old'.", 
-            "Do you wish to proceed? (y/n)"]
-
-            print(term.move_xy(int(W/2 - countStrings(text)/2), int(H/2)) + text[0], text[1], "\n\n")
-            userInput = input(">>")
-
-            if userInput.lower() == "n":
-                return
-            elif userInput.lower() == "y":
-                try:
-                    os.rename(outputPath, oldOutPath)
-                    os.mkdir(outputPath)
-                except FileExistsError:
-                    clear()
-
-                    text = ["A folder named 'output_old' exists. You must rename it in order to preserve data you may want.", "Press enter to continue."]
-
-                    print(term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + term.brown1 + text[0] + term.normal, end='')
-                    countdown(3)
-                    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 1)) + text[1], end='')
-                    
-                    input()
-                    return
+        
     while notFile:
         clear()
         text = ["Please create a file called", "URL.txt",  "at", "and insert a URL at each line. Press enter when you are ready.", 
@@ -472,7 +441,6 @@ def multipleURLConvert():
                     try:
                         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                             ydl.download([uri])
-                        # Obtain the file paths for creating the temp and output folders
                         filename = downFileList
                         currentPos = currentPos+1
                     except FileExistsError:
@@ -490,12 +458,15 @@ def multipleURLConvert():
                         print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
                         countdown(3)
 
-            # Check if there are any files over 8MB
+            
+            # If ffmpeg is not available, do not allow the user to compress media.
             if noComp == True:
                 noFFMPEG(1)
                 return
+
             filePathList = getListOfFiles(mediaPath)
 
+            # Check if there are any files over 8MB
             for fullFilePath in filePathList:
                 fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
                 if getFileSize(fullFilePath) > 8192.00:
@@ -530,6 +501,7 @@ def multipleURLConvert():
                                 shutil.copy(fullFilePath, fullOutFileName)
                                 os.remove(fullFilePath)
                 else:
+                    # Iterate through the file list and move the media to the 'output' folder
                     for fullFilePath in filePathList:
                         filename = str(Path(os.path.basename(fullFilePath)))
                         filePath = str(Path(os.path.dirname(fullFilePath)))
@@ -538,6 +510,7 @@ def multipleURLConvert():
                         shutil.copy(fullFilePath, fullOutFileName)
                         os.remove(fullFilePath)
             else:
+                # Iterate through the file list and move the media to the 'output' folder
                 for fullFilePath in filePathList:
                     filename = str(Path(os.path.basename(fullFilePath)))
                     filePath = str(Path(os.path.dirname(fullFilePath)))
@@ -691,7 +664,8 @@ def singleFileConvert():
                 filePath = currentDir
                 fullFilePath = str(Path(currentDir + r'/' + filename))
                 outputDir = str(Path(currentDir + r'/output'))
-            else: # Full path was entered
+            # Full path was entered
+            else: 
                 filename = str(Path(os.path.basename(userInput) ))
                 filePath = str(Path(os.path.dirname(userInput)))
                 fullFilePath = str(Path(userInput))
@@ -763,8 +737,7 @@ def singleURLConvert():
     clear()
 
     # Create an output directory
-    if not os.path.isdir(outputPath):
-        os.mkdir("output")
+    createOutputFolder(mediaPath)
     
     while notFile:
         url = "https://static1.e621.net/data/sample/89/85/8985342ea8ff4e4c4692f55e082aadb1.jpg"
