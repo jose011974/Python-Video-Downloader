@@ -198,7 +198,7 @@ def getFileSize(file):
 
     return fileSize
 
-def getListOfFiles(dirName):
+def getListOfFiles(dirName, compressing):
     os.chdir(os.path.dirname(__file__))
     folderPath = os.getcwd()
     outPath = str(Path(folderPath + r'/' + "output"))
@@ -212,13 +212,14 @@ def getListOfFiles(dirName):
     for entry in listOfFile:
         # Create full path
         if dirName.lower() == outPath.lower():
-            folderCounter = folderCounter + 1
-            return list()
+            if compressing == 1:
+                folderCounter = folderCounter + 1
+                return list()
         fullPath = os.path.join(dirName, entry)
         # If entry is a directory then get the list of files in this directory 
         if os.path.isdir(fullPath):
             folderCounter = folderCounter + 1
-            allFiles = allFiles + getListOfFiles(fullPath)
+            allFiles = allFiles + getListOfFiles(fullPath, compressing)
         else:
             # If the entry is a media file, append it to the list of files
             ext, fileMIME = getFileExtension(fullPath)
@@ -317,7 +318,7 @@ def multipleFileConvert():
     text = "Counting files..."
     print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text)
 
-    filePathList = getListOfFiles(mediaPath) # Grab files from the path provided by the user
+    filePathList = getListOfFiles(mediaPath, 1) # Grab files from the path provided by the user
     totalFiles = len(filePathList)
     currentPos = 0
     
@@ -464,7 +465,7 @@ def multipleURLConvert():
                 noFFMPEG(1)
                 return
 
-            filePathList = getListOfFiles(mediaPath)
+            filePathList = getListOfFiles(mediaPath, 1)
 
             # Check if there are any files over 8MB
             for fullFilePath in filePathList:
@@ -867,7 +868,7 @@ def spoilMedia(option):
     if mediaPath == "menu":
         return
 
-    filePathList = getListOfFiles(mediaPath)
+    filePathList = getListOfFiles(mediaPath, 0)
 
     if option == 1:
         text = ["I will now append 'SPOILER' to the files in", "Press enter to continue"]
