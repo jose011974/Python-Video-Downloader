@@ -4,7 +4,7 @@
 """ 
     Project Name: Python Video Downloader with yt-dlp support
     Date of Creation: 1/15/2023
-    Last Updated: 1/15/2023
+    Last Updated: 3/27/2023
     Python Version: 3.11 (supports 3.7+)
     Version: 1.0
 """
@@ -158,19 +158,20 @@ def errorHandler(error, uri):
         print("include the URL and error message found below in your issue:\n")
         print(uri, "\n")
         print(error)
-    elif errorMessage == "No video could be found in this tweet": 
-        print(term.brown1 + "ERROR 1:" + term.normal, "yt-dlp was unable to find a valid video source from the tweet provided. If the tweet is accessible, then make sure the tweet",
-        "is not from a private account or a tweet with an image.\n\nFor whatever reason, yt-dlp does not include support for downloading images directly from twitter. If this is",
-        "the case, then please provide the direct link to the image by right clicking the image in question and selecting 'Copy Image Address' or 'Copy Image Link'")
-        print("\nURL:", uri)
     elif errorMessage == "Error(s) while querying API: User has been suspended.":
-        print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended. I am unable to download this tweet.")
+        print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended, and all tweets are no longer accessible by the public.")
         print("\nURL:", uri)
     elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
         print(term.brown1 + "ERROR 404:" + term.normal, "The URL was unable to be accessed. Please make sure that you can access the URL through a web browser. If you can,",
         "then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
+    elif errorMessage == "No video could be found in this tweet":
 
-        
+    else:
+        print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+        print("include the URL and error message found below in your issue:\n")
+        print(uri, "\n")
+        print(error)
+
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
 
     userInput = input(">>")
@@ -256,7 +257,8 @@ def main():
         print("6. No Spoil Media")
         print("7. Open Unsupported URLs")
         print("8. Help")
-        print("9. Exit\n")
+        print("9. Exit")
+        print("0. Update Dependencies\n")
 
         try:
             userInput = int(input(">> "))
@@ -295,6 +297,27 @@ def main():
                 clear()
                 print("Exiting...\n")
                 sys.exit()
+            elif userInput == 0:
+                clear()
+
+                text = "Updating Dependencies..."
+                print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.darkseagreen1 + text + term.normal + "\n")
+                time.sleep(1)
+
+                packages = ["blessed", "numpy", "python-magic", "Pillow", "psutil", "requests", "validators", "yt-dlp"]
+                if platform.system() == "Windows":
+                    packages.append("python-magic-bin")
+
+                for p in packages:
+                    try:
+                        subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--upgrade"])
+                    except Exception as e:
+                        print(e)
+                clear()
+                text = "Dependencies updated."
+                print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.darkseagreen1 + text + term.normal, end='')
+
+                countdown(3)
             
             clear()
         except ValueError:
@@ -1032,17 +1055,9 @@ def updateDependencies():
                 subprocess.check_call([sys.executable, "-m", "pip", "install", p])
             except Exception as e:
                 print(e)
-        elif p in installed_packages:
-            try:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--upgrade"])
-            except Exception as e:
-                print(e)
-                print("\nPress enter to continue.")
-                input()
-            time.sleep(0.3)
-
     clear()
-    print("Dependencies validated.")
+    print("Dependencies validated. It is recommended to update your dependencies every few weeks.")
+    time.sleep(2)
 
 def workingDirectory():
     # Sets the directory to where media is located for multi-file operations
@@ -1157,12 +1172,11 @@ from shutil import which
 
 global term
 global W,H
-#global downFileList
 global noComp
 term = blessed.Terminal()
 W,H = term.width, term.height
-#downFileList = []
 noComp = False
+
 
 while True:
     clear()
