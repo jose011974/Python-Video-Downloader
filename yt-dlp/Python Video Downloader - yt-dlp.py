@@ -442,7 +442,6 @@ def multipleURLConvert():
                     try:
                         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                             ydl.download([uri])
-                        filename = downFileList
                         currentPos = currentPos+1
                     except FileExistsError:
                             os.remove(filename)
@@ -767,15 +766,17 @@ def singleURLConvert():
                 # Download the media file
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
-                    time.sleep(0.4)
+                    time.sleep(1)
                     
             except:
                 errorHandler(errorMessage, uri)
                 return
+            
+            filePathList = getListOfFiles(mediaPath, 1)
 
-            for filename in downFileList:
-                fullFilenamePath = str(Path(mediaPath + r'/' + filename))
+            for fullFilenamePath in filePathList:
                 filePath = os.path.dirname(fullFilenamePath)
+                filename = os.path.basename(fullFilenamePath)
                 outFile = str(Path(outputPath + r'/' + filename))
 
                 fileSize = getFileSize(fullFilenamePath)
@@ -1032,6 +1033,12 @@ def updateDependencies():
             except Exception as e:
                 print(e)
         elif p in installed_packages:
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--upgrade"])
+            except Exception as e:
+                print(e)
+                print("\nPress enter to continue.")
+                input()
             time.sleep(0.3)
 
     clear()
@@ -1099,7 +1106,7 @@ class MyLogger(object):
 def downloadStatus(d):
     if d['status'] == 'finished': # Download status complete
         
-        downFileList.append(d['filename'])
+        #downFileList.append(d['filename'])
 
         print("\nDownloading complete.\n")
 
@@ -1150,11 +1157,11 @@ from shutil import which
 
 global term
 global W,H
-global downFileList
+#global downFileList
 global noComp
 term = blessed.Terminal()
 W,H = term.width, term.height
-downFileList = []
+#downFileList = []
 noComp = False
 
 while True:
