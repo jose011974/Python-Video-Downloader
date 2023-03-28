@@ -158,14 +158,15 @@ def errorHandler(error, uri):
         print("include the URL and error message found below in your issue:\n")
         print(uri, "\n")
         print(error)
+    elif errorMessage == "No video could be found in this tweet":
+        print(term.brown1 + "ERROR 1:" + term.normal, "The tweet does not contain a video. yt-dlp cannot download images for whatever reason. Pester them to fix the issue, not me.")
     elif errorMessage == "Error(s) while querying API: User has been suspended.":
         print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended, and all tweets are no longer accessible by the public.")
         print("\nURL:", uri)
     elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
         print(term.brown1 + "ERROR 404:" + term.normal, "The URL was unable to be accessed. Please make sure that you can access the URL through a web browser. If you can,",
         "then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
-    elif errorMessage == "No video could be found in this tweet":
-
+    
     else:
         print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
         print("include the URL and error message found below in your issue:\n")
@@ -900,7 +901,6 @@ def spoilMedia(option):
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
             term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
-        countdown(3)
         print
         input(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
 
@@ -914,7 +914,6 @@ def spoilMedia(option):
             term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
             term.move_xy(int(W/2 - len(mediaPath)/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
-        countdown(3)
         print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
         input()
 
@@ -928,12 +927,11 @@ def spoilMedia(option):
     text = ["Procedure complete. The files are located at:", "Press Enter to continue."]
 
     print(
-        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 3)) + text[0],
-        term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2 - 1)) + term.cadetblue1 + mediaPath + term.normal, end=''
+        term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0],
+        term.move_xy(int(W/2 - (len(mediaPath))/2), int(H/2)) + term.cadetblue1 + mediaPath + term.normal, end=''
         )
 
-    countdown(5)
-    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 3)) + text[1])
+    print(term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1])
     input()
 
 def title():
