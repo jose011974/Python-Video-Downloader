@@ -4,9 +4,9 @@
 """ 
     Project Name: Python Video Downloader with yt-dlp support
     Date of Creation: 1/15/2023
-    Last Updated: 3/27/2023
+    Last Updated: 4/13/2023
     Python Version: 3.11 (supports 3.7+)
-    Version: 1.0
+    Version: 1.01
 """
 
 import fileinput
@@ -164,8 +164,11 @@ def errorHandler(error, uri):
         print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended, and all tweets are no longer accessible by the public.")
         print("\nURL:", uri)
     elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
-        print(term.brown1 + "ERROR 404:" + term.normal, "The URL was unable to be accessed. Please make sure that you can access the URL through a web browser. If you can,",
-        "then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
+        print(term.brown1 + "ERROR 404:" + term.normal, "The URL could not be accessed. Please make sure that the URL points to a valid address.\n\n" +
+            term.brown1 + "NOTE:" + term.normal, "If you are trying to download a video from Twitter, and it is age restricted, you are going to have to pass cookies in order to download the video. " +
+            "If you are skilled enough, you can edit the script and include the cookies yourself. Otherwise, you will have to wait until I can automatucally find the cookies " +
+            "for you, or use another program.\n\n" +
+            "If you are not trying to download an age restricted Twitter video, and you can access the video in question, then you may then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
     
     else:
         print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
