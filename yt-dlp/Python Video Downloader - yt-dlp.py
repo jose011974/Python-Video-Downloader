@@ -1132,6 +1132,11 @@ ydl_opts = {
     'no_color': True,
     'logger': MyLogger(),
     'progress_hooks': [downloadStatus],
+    'cookiesfrombrowser': ('firefox', '07oa3ig4.default-release', None, 'userContextPersonal.label')
+    
+
+    # C:\Users\Blunt\AppData\Roaming\Mozilla\Firefox\Profiles\07oa3ig4.default-release
+    # 
 }
 
 # ---------------------------------
