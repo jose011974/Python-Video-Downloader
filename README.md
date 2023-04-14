@@ -1,7 +1,12 @@
+
 # Python Video Downloader
 
-It is recommended to use the yt-dlp version vs. the Youtube-DL version.
+There are 2 versions available for use:
 
-It seems that the Youtube-DL version is considered abandoned, thus the reason for the yt-dlp version existing. It is more up to date with websites and has the most features.
+Youtube-DL and yt-dlp
 
-I did not want to get rid of the Youtube-DL version so I decided to make seperate folders for each version. They function the same, the only difference is the library used to download media from the internet.
+**[Youtube-DL](https://github.com/ytdl-org/youtube-dl)** has not recived an update since 2021, and thus is considered abandonded. If you are savy enough, you can install the development builds and have a more up to date library, with the exception that there may be unexpected behavior.
+
+**[yt-dlp](https://github.com/yt-dlp/yt-dlp)** is a fork of Youtube-DL; it has more features and is updated more frequently. This is the version I **recommend** using, and the version I will provide updates and fixes to.
+
+*As with any program, I (Jose Marquez) am not responsible for any loss of data when using Python Video Downloader. By downloading and using this program, you are accepting any and all risks associated with using this program.*
