@@ -1126,6 +1126,11 @@ def downloadStatus(d):
 
         print("\nDownloading complete.\n")
 
+if platform.system() == "Linux":
+    cookie = ('firefox', '0j09wzaq.default-release', None, 'userContextPersonal.label')
+elif platform.system() == "Windows":
+    cookie = ('firefox', '07oa3ig4.default-release', None, 'userContextPersonal.label')
+
 
 # Parameters for yt-dlp.
 # See https://github.com/yt-dlp/yt-dlp/blob/5ab3534d44231f7711398bc3cfc520e2efd09f50/yt_dlp/YoutubeDL.py#L159
@@ -1135,11 +1140,9 @@ ydl_opts = {
     'no_color': True,
     'logger': MyLogger(),
     'progress_hooks': [downloadStatus],
-    'cookiesfrombrowser': ('firefox', '07oa3ig4.default-release', None, 'userContextPersonal.label')
-    
+    'cookiesfrombrowser': cookie
 
     # C:\Users\Blunt\AppData\Roaming\Mozilla\Firefox\Profiles\07oa3ig4.default-release
-    # 
 }
 
 # ---------------------------------
