@@ -154,7 +154,7 @@ If you have any issues, please go to the [troubleshooting](https://github.com/jo
 
 ### Using Python Video Downloader
 
-The main menu and the available options are shown below:
+The main menu and the available options are shown below (current options may not be reflective in the screenshot below):
 
 ![Python Video Downloader Main Menu](https://i.imgur.com/GXBKfKi.png "Python Video Downloader Main Menu")
 
