@@ -12,7 +12,6 @@
 import fileinput
 import os
 import platform
-import re
 import shutil
 import subprocess
 import sys
@@ -262,7 +261,7 @@ def main():
         print("7. Open Unsupported URLs")
         print("8. Help")
         print("9. Exit")
-        print("0. Update Dependencies\n")
+        print("0. Update Dependencies (reqires Admin permissions)\n")
 
         try:
             userInput = int(input(">> "))
