@@ -941,7 +941,7 @@ def title():
 
     # Create a title bar based on the console window size
 
-    title = "[Python Video Downloader.py v1.0 - Download and compress media]"
+    title = "[Python Video Downloader.py v1.01 - Download and compress media]"
     consoleSize = shutil.get_terminal_size()
     col = int(consoleSize[0])-len(title)
 
