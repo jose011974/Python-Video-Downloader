@@ -29,8 +29,6 @@ This python script is designed to do the following:
 - Append "SPOILER_" to file names for sharing pictures of your sweet ride to your Discord peeps.
 - Remove "SPOILER_" from file names for whatever reason.
 
-Note: As of 4/10/23, the file size limit for free users of Discord has been increased to 25 MB which is nothing in my opinion. This will be reflected in a nightly build soon.
-
 # Prerequisites
 
 You are going to need the following:
