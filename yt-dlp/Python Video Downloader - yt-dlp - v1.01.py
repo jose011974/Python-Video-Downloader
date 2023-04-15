@@ -367,7 +367,7 @@ def multipleFileConvert():
         convFile = str(Path(outputPath + r'/' + filename))
 
         if os.path.isfile(fullFilePath):
-            if getFileSize(fullFilePath) > 8192.00:
+            if getFileSize(fullFilePath) > 25600.00:
                     text = "Current file: "
                     text2 = " | " + str(getFileSize(fullFilePath)) + " MB | File " + str(currentPos) + " of " + str(totalFiles) + "\n"
                     print(term.move_xy(int(W/2 - (len(text) + len(filename) + len(text2))/2), int(H/2 - 2)) + text + 
@@ -519,7 +519,7 @@ def multipleURLConvert():
                         currentPos = currentPos+1
 
                         if os.path.isfile(fullFilePath):
-                            if getFileSize(fullFilePath) > 8192.00:
+                            if getFileSize(fullFilePath) > 25600.00:
                                 convert(filename, filePath)
                                 os.remove(fullFilePath)
                                 clear()
@@ -728,7 +728,7 @@ def singleFileConvert():
 
     try:
         # Determine if the media file needs compression
-        if getFileSize(fullFilePath) > 8192.00:
+        if getFileSize(fullFilePath) > 25600.00:
             clear()
             text = "Compressing"
             print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
@@ -807,7 +807,7 @@ def singleURLConvert():
 
                 fileSize = getFileSize(fullFilenamePath)
 
-                if fileSize > 8192.00:
+                if fileSize > 25600.00:
                     if noComp == True:
                         noFFMPEG(1)
                         return
