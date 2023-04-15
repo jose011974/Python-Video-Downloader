@@ -24,12 +24,10 @@ I hope to fix these issues in the future. For now, I suggest placing the script 
 This python script is designed to do the following:
 
 - Download media from the internet using one or multiple URL's
-- Compress single or multiple media; the minimum threshold being 8 MB as that is what Discord has set their free limit to.
-	- A basic ffmpeg parameter is used, as if a file cannot be compressed under 8 MB, the next option will be to segment the file. (segmentation is not implimented yet)
+- Compress single or multiple media; the minimum threshold being 25 MB as that is what Discord has set their free limit to.
+	- A basic ffmpeg parameter is used, as if a file cannot be compressed under 25 MB, the next option will be to segment the file. (segmentation is not implimented yet)
 - Append "SPOILER_" to file names for sharing pictures of your sweet ride to your Discord peeps.
 - Remove "SPOILER_" from file names for whatever reason.
-
-Note: As of 4/10/23, the file size limit for free users of Discord has been increased to 25 MB which is nothing in my opinion. This will be reflected in a nightly build soon.
 
 # Prerequisites
 
@@ -156,7 +154,7 @@ If you have any issues, please go to the [troubleshooting](https://github.com/jo
 
 ### Using Python Video Downloader
 
-The main menu and the available options are shown below:
+The main menu and the available options are shown below (current options may not be reflective in the screenshot below):
 
 ![Python Video Downloader Main Menu](https://i.imgur.com/GXBKfKi.png "Python Video Downloader Main Menu")
 
@@ -209,7 +207,7 @@ TODO
 This script was created in thanks to:
 
 - Twitter not adding a download button to tweets
-- Discord not allowing regular members to upload files larger than 20 MB without paying:
+- Discord not allowing regular members to upload files larger than 25 MB without paying:
 	- $3 a month or $30 a year for a 50 MB cap 
 	- $10 a month or $100 a year for a 500 MB cap
 
