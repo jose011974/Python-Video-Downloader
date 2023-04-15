@@ -495,7 +495,7 @@ def multipleURLConvert():
             # Check if there are any files over 8MB
             for fullFilePath in filePathList:
                 fullFilePath = str(Path(fullFilePath)).encode('ascii','ignore').decode('ascii')
-                if getFileSize(fullFilePath) > 8192.00:
+                if getFileSize(fullFilePath) > 25600.00:
                     largeFileCount = largeFileCount+1
             
             # Ask the user if they want to compress any files over 8MB
