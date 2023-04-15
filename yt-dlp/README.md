@@ -24,8 +24,8 @@ I hope to fix these issues in the future. For now, I suggest placing the script 
 This python script is designed to do the following:
 
 - Download media from the internet using one or multiple URL's
-- Compress single or multiple media; the minimum threshold being 8 MB as that is what Discord has set their free limit to.
-	- A basic ffmpeg parameter is used, as if a file cannot be compressed under 8 MB, the next option will be to segment the file. (segmentation is not implimented yet)
+- Compress single or multiple media; the minimum threshold being 25 MB as that is what Discord has set their free limit to.
+	- A basic ffmpeg parameter is used, as if a file cannot be compressed under 25 MB, the next option will be to segment the file. (segmentation is not implimented yet)
 - Append "SPOILER_" to file names for sharing pictures of your sweet ride to your Discord peeps.
 - Remove "SPOILER_" from file names for whatever reason.
 
@@ -207,7 +207,7 @@ TODO
 This script was created in thanks to:
 
 - Twitter not adding a download button to tweets
-- Discord not allowing regular members to upload files larger than 20 MB without paying:
+- Discord not allowing regular members to upload files larger than 25 MB without paying:
 	- $3 a month or $30 a year for a 50 MB cap 
 	- $10 a month or $100 a year for a 500 MB cap
 
