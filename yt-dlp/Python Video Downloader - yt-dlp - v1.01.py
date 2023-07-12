@@ -4,9 +4,16 @@
 """ 
     Project Name: Python Video Downloader with yt-dlp support
     Date of Creation: 1/15/2023
-    Last Updated: 4/13/2023
+    Last Updated: 7/12/2023
     Python Version: 3.11 (supports 3.7+)
-    Version: 1.01
+    Version: 1.02
+
+    Changelog:
+
+    * Updated error message when attempting to download media when not logged in
+    * Added error message when Profile folder is not found (folder that holds your browser cookies)
+    * Added 'Unsuccessful download' message
+    * Added --user parameter to update python dependencies
 """
 
 import fileinput
@@ -164,10 +171,13 @@ def errorHandler(error, uri):
         print("\nURL:", uri)
     elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
         print(term.brown1 + "ERROR 404:" + term.normal, "The URL could not be accessed. Please make sure that the URL points to a valid address.\n\n" +
-            term.brown1 + "NOTE:" + term.normal, "If you are trying to download a video from Twitter, and it is age restricted, you are going to have to pass cookies in order to download the video. " +
-            "If you are skilled enough, you can edit the script and include the cookies yourself. Otherwise, you will have to wait until I can automatucally find the cookies " +
-            "for you, or use another program.\n\n" +
+            term.brown1 + "NOTE:" + term.normal, "If you are trying to download a video from Twitter, you are going to have to pass cookies in order to download the video. " +
+            "Click here for more information: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader" +
             "If you are not trying to download an age restricted Twitter video, and you can access the video in question, then you may then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
+    elif errorMessage == "Requested tweet may only be available when logged in. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
+        print(term.brown1 + "ERROR 3:" + term.normal, "Twitter now requires you to log in to see any tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
+    elif errorMessage == "Profile Folder not Found.":
+        print(term.brown1 + "ERROR 4:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
     
     else:
         print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
@@ -313,7 +323,7 @@ def main():
 
                 for p in packages:
                     try:
-                        subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--upgrade"])
+                        subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--upgrade", "--user"])
                     except Exception as e:
                         print(e)
                 clear()
@@ -472,6 +482,11 @@ def multipleURLConvert():
                     except FileExistsError:
                             os.remove(filename)
                             currentPos = currentPos+1
+                    except FileNotFoundError:
+                        clear()
+
+                        print("The required cookies for Twitter dot com were not found. Please go to [TBD] to learn more about restoring cookies.")
+                        print("You must close the program and fix the issue before proceeding.")
                     except:
                         if eMessage != "suppress":
                             eMessage = errorHandler(errorMessage, uri)
@@ -483,6 +498,9 @@ def multipleURLConvert():
 
                         print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
                         countdown(3)
+                        
+
+                        # 
 
             
             # If ffmpeg is not available, do not allow the user to compress media.
@@ -793,52 +811,79 @@ def singleURLConvert():
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([uri])
                     time.sleep(1)
-                    
+
+            except FileNotFoundError:
+                errorMessage = "No cookies for you!: Profile Folder not Found."
+                errorHandler(errorMessage, uri)
+                
             except:
+                
                 errorHandler(errorMessage, uri)
                 return
             
-            filePathList = getListOfFiles(mediaPath, 1)
+            if errorMessage == None:
+            
+                filePathList = getListOfFiles(mediaPath, 1)
 
-            for fullFilenamePath in filePathList:
-                filePath = os.path.dirname(fullFilenamePath)
-                filename = os.path.basename(fullFilenamePath)
-                outFile = str(Path(outputPath + r'/' + filename))
+                for fullFilenamePath in filePathList:
+                    filePath = os.path.dirname(fullFilenamePath)
+                    filename = os.path.basename(fullFilenamePath)
+                    outFile = str(Path(outputPath + r'/' + filename))
 
-                fileSize = getFileSize(fullFilenamePath)
+                    fileSize = getFileSize(fullFilenamePath)
 
-                if fileSize > 25600.00:
-                    if noComp == True:
-                        noFFMPEG(1)
-                        return
-
-                    clear()
-                    text = "Download complete. Do you wish to compress the media? (y/n)"
-                    print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='\n\n')
-
-                    userInput = input(">> ")
-
-                    if userInput.lower() == "y":
-                        clear()
-                        text = "Compressing"
-                        print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
-                        convert(filename, filePath)
+                    if fileSize > 25600.00:
+                        if noComp == True:
+                            noFFMPEG(1)
+                            return
 
                         clear()
-                        text = ["The media file has been sucessfully compressed and is located at", "Returning to the main menu in"]
-                        print(
-                            term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0], 
-                            term.move_xy(int(W/2 - len(outFile)/2), int(H/2)), term.cadetblue1 + outFile, term.normal, "\n",
-                            term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
-                        )
+                        text = "Download complete. Do you wish to compress the media? (y/n)"
+                        print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + text, end='\n\n')
 
-                        countdown(5)
-                        return
+                        userInput = input(">> ")
+
+                        if userInput.lower() == "y":
+                            clear()
+                            text = "Compressing"
+                            print(term.move_xy(int(W/2 - (len(text) + len(filename))/2), int(H/2)) + text, term.cadetblue1 + filename, term.normal)
+                            convert(filename, filePath)
+
+                            clear()
+                            text = ["The media file has been sucessfully compressed and is located at", "Returning to the main menu in"]
+                            print(
+                                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0], 
+                                term.move_xy(int(W/2 - len(outFile)/2), int(H/2)), term.normal, "\n",
+                                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
+                            )
+
+                            countdown(5)
+                            return
+                        else:
+                            try:
+                                shutil.copy(fullFilenamePath, outFile)
+                                os.remove(fullFilenamePath)
+                            except shutil.SameFileError:
+                                clear()
+
+                                text = ["A file with the name", "already exists. Would you like to overwrite it? (Y/N)\n"]
+                                textLength = countStrings(text) + len(filename)
+                                
+                                print(term.move_xy(int(W/2 - textLength/2), int(H/2)) + text[0], term.cadetblue1, filename, term.normal, text[1], end='\n\n')
+                                userInput = input(">> ")
+
+                                if userInput.lower() == "y":
+                                    shutil.copy(fullFilenamePath, outFile)
+                                    os.remove(fullFilenamePath)
+                                elif userInput.lower() == "n":
+                                    clear()
+                                    return
+                                return
                     else:
                         try:
                             shutil.copy(fullFilenamePath, outFile)
                             os.remove(fullFilenamePath)
-                        except FileExistsError:
+                        except shutil.SameFileError:
                             clear()
 
                             text = ["A file with the name", "already exists. Would you like to overwrite it? (Y/N)\n"]
@@ -853,39 +898,30 @@ def singleURLConvert():
                             elif userInput.lower() == "n":
                                 clear()
                                 return
-                            return
-                else:
-                    try:
-                        shutil.copy(fullFilenamePath, outFile)
-                        os.remove(fullFilenamePath)
-                    except FileExistsError:
-                        clear()
-
-                        text = ["A file with the name", "already exists. Would you like to overwrite it? (Y/N)\n"]
-                        textLength = countStrings(text) + len(filename)
                         
-                        print(term.move_xy(int(W/2 - textLength/2), int(H/2)) + text[0], term.cadetblue1, filename, term.normal, text[1], end='\n\n')
-                        userInput = input(">> ")
+                clear()
 
-                        if userInput.lower() == "y":
-                            shutil.copy(fullFilenamePath, outFile)
-                            os.remove(fullFilenamePath)
-                        elif userInput.lower() == "n":
-                            clear()
-                            return
-                    
-            clear()
+                text = ["Media successfully downloaded and is located at", "Returning to main menu in"]
 
-            text = ["Media successfully downloaded and is located at", "Returning to main menu in"]
+                print(
+                    term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0] + "\n\n", 
+                    term.move_xy(int(W/2 - len(outputPath)/2), int(H/2)) + term.cadetblue1, outputPath, term.normal, 
+                    term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
+                    )
+                
+                countdown(5)
+                return
+            else:
+                text = ["Media unsuccessfully downloaded.", "Returning to main menu in"]
 
-            print(
-                term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 2)) + text[0] + "\n\n", 
-                term.move_xy(int(W/2 - len(outputPath)/2), int(H/2)) + term.cadetblue1, outputPath, term.normal, 
-                term.move_xy(int(W/2 - len(text[1])/2), int(H/2 + 2)) + text[1], end=''
-                )
-            
-            countdown(5)
-            return
+                print(
+                    term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0] + "\n\n", 
+                    term.move_xy(int(W/2 - len(text[1])/2) - 2, int(H/2 + 2)) + text[1], end=''
+                    )
+                
+                countdown(5)
+                return
+
 
 def spoilMedia(option):
     clear()
@@ -1126,9 +1162,9 @@ def downloadStatus(d):
         print("\nDownloading complete.\n")
 
 if platform.system() == "Linux":
-    cookie = ('firefox', '0j09wzaq.default-release', None, 'userContextPersonal.label')
+    cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
 elif platform.system() == "Windows":
-    cookie = ('firefox', '07oa3ig4.default-release', None, 'userContextPersonal.label')
+    cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
 
 
 # Parameters for yt-dlp.
@@ -1141,7 +1177,7 @@ ydl_opts = {
     'progress_hooks': [downloadStatus],
     'cookiesfrombrowser': cookie
 
-    # C:\Users\Blunt\AppData\Roaming\Mozilla\Firefox\Profiles\07oa3ig4.default-release
+    # AppData\Roaming\Mozilla\Firefox\Profiles\
 }
 
 # ---------------------------------
