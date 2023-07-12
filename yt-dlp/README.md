@@ -178,7 +178,7 @@ The main menu and the available options are shown below (current options may not
 - **Option 7: Any URLs that were not able to be downloaded will be placed in a text file called `Unsupported URLs.txt` .** This option will automatically go through all URLs in the text file and open them in your web browser so you can download them manually.
 - **Option 8: Open the GitHub page of this script**
 - **Option 9: Exit the script.**
-- Option 0: Update dependencies (must run the script with admin privileges
+- Option 0: Update dependencies
 
 ### Extra Notes:
 - Only files above 25 MB will be compressed. This is because Discord wants money apparently.
@@ -236,10 +236,4 @@ This script was created with:
 - Sublime Text 4
 - Lots of late nights, frustration filled days, drinking caffinated beverages, and pain.
 
-If you would like to make any changes, please credit me as the original author and do not sell anything included with this repository.
-
-**NOTE:
-Downloading age-restricted tweets now requires a Twitter account to access. If you are savy enough, you may integrate the cookiesfrombrowser parameter in ydl_opts and log into twitter using the Personal container on Firefox. Don't understand? You're out of luck till I create a guide.**
-
-**Access to the twitter API has also be limited severely; I am not sure how the Twitter extactor from yt-dlp works, so it may break that part and ruin the main reason of why this script was created. Thanks Elon.**
-
+You are not allowed to monetize anything from this repository.
