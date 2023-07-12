@@ -1,4 +1,5 @@
 
+
 # Important Notes!
 
 It is imperative that you understand that I am **NOT** responsible for any data loss that **will** occur if you do not take into account the quirks of this script.
@@ -134,6 +135,8 @@ Video Tutorial: TBD
 **Windows 10/11 Instructions**:
 - Assuming the defaults were selected, double click `Python Video Downloader.py` to launch the script. If you have extensions disabled, you may only see `Python Video Downloader`
 
+If you have any issues launching the script, see Troubleshooting.
+
 **Linux Instructions**:
 - In order to allow the script to be executed with a double click gesture, you must right click and allow the script to be executed. This WILL differ depending on your file manager.
 
@@ -200,7 +203,17 @@ This parameter is broken in that the output file can be larger than the source f
 
 # Troubleshooting
 
-TODO
+* **When you double click the script, nothing happens or you see a black box that disappears quickly:**
+	* 1. Press Win + R to open the Run Dialog Box, then type "cmd" (without the quotes) and press Enter or OK.
+	* 2. A black box with white text should appear. Drag the script onto the window and press enter. You should get an error message on why the script isn't opening.
+	
+	* Python Execution Error:
+	![enter image description here](https://github.com/jose011974/Python-Video-Downloader/blob/main/Readme%20Assets/Python%20Execution%20Error.png?raw=true)
+	* To fix this:
+		1. Press your Windows Key and type "Apps and Features". Press enter.
+		2. A window should open, and near the top, click on "App execution aliases"
+		![enter image description here](https://github.com/jose011974/Python-Video-Downloader/blob/main/Readme%20Assets/Python%20Execution%20Error1.png?raw=true)
+		3. Find "python.exe" and "python3.exe" near the bottom of the list. Turn the switches off and try running the script again.
 
 # Credits
 
@@ -226,7 +239,7 @@ This script was created with:
 If you would like to make any changes, please credit me as the original author and do not sell anything included with this repository.
 
 **NOTE:
-Downloading age-restricted tweets now requires a twitter account to access. If you are savy enough, you may integrate the cookiesfrombrowser parameter in ydl_opts and log into twitter using the Personal container on Firefox. Don't understand? You're out of luck.**
+Downloading age-restricted tweets now requires a Twitter account to access. If you are savy enough, you may integrate the cookiesfrombrowser parameter in ydl_opts and log into twitter using the Personal container on Firefox. Don't understand? You're out of luck till I create a guide.**
 
-**Access to the twitter API will also be limited severely; I am not sure how the Twitter extactor from yt-dlp works, so it may break that part and ruin the main reason of why this script was created. Thanks Elon.**
+**Access to the twitter API has also be limited severely; I am not sure how the Twitter extactor from yt-dlp works, so it may break that part and ruin the main reason of why this script was created. Thanks Elon.**
 
