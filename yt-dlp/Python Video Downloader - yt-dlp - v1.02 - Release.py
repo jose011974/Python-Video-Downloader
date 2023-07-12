@@ -1166,7 +1166,7 @@ def downloadStatus(d):
 if platform.system() == "Linux":
     cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
 elif platform.system() == "Windows":
-    cookie = ('firefox', 's16fq7c5.default-release-1688841050907', None, 'userContextPersonal.label')
+    cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
 
 
 # Parameters for yt-dlp.
