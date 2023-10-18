@@ -1,12 +1,10 @@
-# NOTE: after restarting and installing python to C:\, the image library detection error went away. maybe a restart is required.
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """ 
     Project Name: Python Video Downloader with yt-dlp support
     Date of Creation: 1/15/2023
-    Last Updated: 10/13/2023
+    Last Updated: 10/17/23
     Python Version: 3.11 (supports 3.7+)
     Version: 1.03
 
@@ -14,6 +12,8 @@
 
     * Updated error message when attempting to download media when not logged in
         * There are 3 different error messages that can occur. This update includes one extra error message.
+
+    NOTE: It seems that a restart may fix the Magic Library not being detected upon fresh installation. More testing will be done at some point.
 """
 
 import fileinput
@@ -141,21 +141,12 @@ def countStrings(text):
 
 def errorHandler(error, uri):
     # yt-dlp provides a more sophisicated error handler. 
-    # This function strips out the first 8 characters of the error, then iterates through the string till a : is found, at which point the remaining string is
+    # This function strips out the first 8 characters of the error, then iterates through the error till a : is found, at which point the remaining string is
     # compared to a list of pre-defined error messages, and the appropriate explination of why the error occured is shown to the user.
 
-    if error == '1':
-        clear()
-
-        print("You are not signed into twitter using the Personal Container in Firefox.",
-              "Please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader and follow the steps.\n",
-              "This program will now exit.")
-
-        sys.exit()
-    else:
-        counter = -1
-        errorMessage = ""
-        error = error[7:]
+    counter = -1
+    errorMessage = ""
+    error = error[7:]
 
     # Iterate over the error message
     for element in error:
@@ -167,8 +158,6 @@ def errorHandler(error, uri):
     # Compare the error to a list of pre-determined error messages and print an explanation of the error to the screen.
 
     clear()
-
-    # Unknown error.
     
     if errorMessage == "":
         print(term.brown1 + "ERROR 0:" + term.normal, "An unknown error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
@@ -518,7 +507,8 @@ def multipleURLConvert():
                             os.remove(filename)
                             currentPos = currentPos+1
                     except FileNotFoundError:
-                        errorHandler("1", "null")  
+                        errorMessage = "No cookies for you!: Profile Folder not Found."
+                        errorHandler(errorMessage, uri)
                     except:
                         if eMessage != "suppress":
                             eMessage = errorHandler(errorMessage, uri)
@@ -1194,7 +1184,7 @@ def downloadStatus(d):
 if platform.system() == "Linux":
     cookie = ('firefox', '0j09wzaq.default-release', None, 'userContextPersonal.label')
 elif platform.system() == "Windows":
-    cookie = ('firefox', 'fk0b1jk2.default-release', None, 'userContextPersonal.label')
+    cookie = ('firefox', 'mrsjotfr.default-release-1697316004883', None, 'userContextPersonal.label')
 
 
 # Parameters for yt-dlp.
