@@ -8,8 +8,6 @@
     Python Version: Supports 3.7+
     Version: 1.04
 
-    (This release was tested on Linux, oopsie!)
-
     Changelog:
 
     * Added an easier way to pass cookies to the script. A 'cookies.txt' file is used. It has instructions inside the file.
@@ -91,11 +89,15 @@ def checkForCookies():
             clear()
             
             print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+            print("Press enter to continue.")
+            input()
         else:
             if platform.system() == "Linux":
                 if not os.path.exists(homeDir + r'/.mozilla/firefox/' + cookieList[1]): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
                     return cookieList[1]
@@ -103,6 +105,8 @@ def checkForCookies():
                 if not os.path.exists(homeDir + r'/Roaming/Mozilla/Firefox/Profiles/' + cookieList[0]): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
                     return cookieList[0]

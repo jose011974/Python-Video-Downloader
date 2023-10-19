@@ -1,18 +1,16 @@
 """ 
     Project Name: Python Video Downloader with yt-dlp support for Microsoft Windows
     Date of Creation: 1/15/2023
-    Last Updated: 10/18/23
+    Last Updated: 10/19/23
     Python Version: Supports 3.7+
-    Version: 1.04
+    Version: 1.04a
 
     (This release was tested on Linux, oopsie!)
 
-    Changelog:
-
-    * Added an easier way to pass cookies to the script. A 'cookies.txt' file is used. It has instructions inside the file.
-    * If the magic library fails to load, we let the user know that they must restart the script.
-        * In testing, it is required to restart the script in order for the library to load correctly. I have no idea why this is required.
-    * Reogranized function order (OCD baybee!)
+    Hotfix:
+    
+    * Cookie detection on windows returned a '\n' at the end of the path. Which does not exist. Or work.
+        * Remove '\n' from the strings in cookieList
 
     NOTE: It seems that the script may need to be restarted in order to allow Magic to work.
 """
@@ -88,21 +86,35 @@ def checkForCookies():
             clear()
             
             print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+            print("Press enter to continue.")
+            input()
         else:
+
+            # This snippet removes the '\n' from the variables in cookieList. 
+            # Otherwise the OS will try to find a path that has '\n' in it which does not exist.
+
+            windowsCookie, linuxCookie = cookieList
+            windowsCookie = windowsCookie.replace('\n', '')
+            linuxCookie = linuxCookie.replace('\n', '')
+
             if platform.system() == "Linux":
-                if not os.path.exists(homeDir + r'/.mozilla/firefox/' + cookieList[1]): # We try to access the Profile Folder.
+                if not os.path.exists(homeDir + r'/.mozilla/firefox/' + linuxCookie): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
-                    return cookieList[1]
+                    return linuxCookie
             elif platform.system() == "Windows":
-                if not os.path.exists(homeDir + r'/Roaming/Mozilla/Firefox/Profiles/' + cookieList[0]): # We try to access the Profile Folder.
+                if not os.path.exists(homeDir + r'/Appdata/Roaming/Mozilla/Firefox/Profiles/' + windowsCookie): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
-                    return cookieList[0]
+                    return windowsCookie
 
             # AppData\Roaming\Mozilla\Firefox\Profiles\ - Windows
             # /home/blunt/.mozilla/firefox/             - Linux
