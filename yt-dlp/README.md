@@ -150,8 +150,17 @@ Note: If you installed python in a custom directory on Linux, you may need to ch
 	- pip installation
 	- The presence of required packages
 	- The presence of ffmpeg
+ 	- The presense of Firefox Profile folder in cookies.txt
 
 Assuming everything was installed and works correctly, congration! You are now a proud operator of Python Video Downloader!
+
+### HOWEVER
+
+The script will prompt you to open a file called cookies.txt, and replace "PROFILE NAME GOES HERE" with the name of your Firefox Profile folder.
+
+A Firefox Profile folder is essentially where all of your settings, bookmarks, history, cookies, etc. are stored for the Firefox Browser on your system.
+
+For more information, please [click here.](https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-pass-your-cookies-to-Python-Video-Downloader)
 
 If you have any issues, please go to the [troubleshooting](https://github.com/jose011974/Python-Video-Downloader/blob/main/README.md#troubleshooting "troubleshooting") section.
 
