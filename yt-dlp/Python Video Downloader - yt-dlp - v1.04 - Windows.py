@@ -1,19 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 """ 
-    Project Name: Python Video Downloader with yt-dlp support
+    Project Name: Python Video Downloader with yt-dlp support for Microsoft Windows
     Date of Creation: 1/15/2023
-    Last Updated: 10/17/2023
-    Python Version: 3.11 (supports 3.7+)
-    Version: 1.03
+    Last Updated: 10/18/23
+    Python Version: Supports 3.7+
+    Version: 1.04
+
+    (This release was tested on Linux, oopsie!)
 
     Changelog:
 
-    * Updated error message when attempting to download media when not logged in
-        * There are 3 different error messages that can occur. This update includes one extra error message.
+    * Added an easier way to pass cookies to the script. A 'cookies.txt' file is used. It has instructions inside the file.
+    * If the magic library fails to load, we let the user know that they must restart the script.
+        * In testing, it is required to restart the script in order for the library to load correctly. I have no idea why this is required.
+    * Reogranized function order (OCD baybee!)
 
-    NOTE: It seems that a restart may fix the Magic Library not being detected upon fresh installation. More testing will be done at some point.
+    NOTE: It seems that the script may need to be restarted in order to allow Magic to work.
 """
 
 import fileinput
@@ -29,41 +30,82 @@ from pathlib import Path
 
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"] # Used to filter out non-media files
 
-# Create a folder to move completed files to as to not clog up the script directory
-def createOutputFolder(currentDir):
-    outputDir = str(Path(currentDir + r'/output'))
-    boolVal = True
-    # Create the output folder
-    while boolVal:
-        try:
-            if not os.path.isdir(outputDir):
-                os.mkdir(outputDir)
-                boolVal = False
-            else:
-                boolVal = False
-        
-        # No permissions
-        except PermissionError:
-            clear()
-            print(term.brown1 + "Error: Missing required permissions. Please make sure you have read and write access to" + term.normal +
-            term.cadetblue1 + currentDir, + term.normal + "in order to create the neccessary folders.\n To try again, type y. If you would" +
-            "rather instead use the path the script is located at, type 'n'.\nTo return to the main menu, type 'menu'\n")
+# This function uses a cookies.txt file to find and load cookies in the Firefox Profile.
+# In the past, you had to manually open the script and paste the profile name into the cookies variable.
 
-            userInput = input(">> ")
+def checkForCookies():
+    # If a cookies.txt is not found, we let the user know and create one from scratch.
+    if not os.path.isfile(os.getcwd() + r'/' + "cookies.txt"):
+        clear()
 
-            if userInput == "y":
+        print("A cookies.txt file was not found. Please open the cookies.txt file and paste your Firefox Profile folder name",
+              "in the appropriate area.\n")
+        print("cookies.txt is located at", os.getcwd())
+
+        f = open('cookies.txt','w')
+
+        f.writelines(
+            ["# cookies.txt for Python Video Downloader by PineCone\n\n",
+             "# Instructions: Replace 'PROFILE NAME GOES HERE' with the name of the folder that corresponds to your Firefox profile.\n",
+             "# If you don't know what any of this means, please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader\n",
+             " \n",
+             "# Windows:\n",
+             "PROFILE NAME GOES HERE\n"
+             " \n",
+             "# Linux:\n",
+             "PROFILE NAME GOES HERE"
+             ]
+            )
+        sys.exit()
+    else:
+        f = open('cookies.txt', 'r')
+        readCookieFile = f.readlines()
+        cookieList = ['do not use', 'near cookie monster']
+        counter = 0
+        homeDir = os.path.expanduser('~')
+
+        # The function reads the cookies.txt file line by line. If a '#' or 'PROFILE NAME GOES HERE' is found, that line is ignored.
+        # Otherwise, it is loaded into the appropriate index. Index 0 is for Windows, Index 1 is for Linux systems.
+        # While one index will have a placeholder value, it does not matter because there is no such thing as Winux. (Unless...?)
+
+        for i in readCookieFile:
+            if i[:1] == "#" or i[:1] == "\n" or i[:1] == " ": # We filter out '#', New Line, or space characters
                 continue
-            elif userInput == "n":
-                return
-            elif userInput == "menu":
-                return
+            
+            # We filter out placeholder values in the file, and increment the counter.
+            # We do this in the even the user only fills out one OS. Many people do not even know what Linux is.
 
-def clear():
-    command = 'clear' # Unix
-    if platform.system() == "Windows": command = 'cls' # Windows
-    os.system(command)
+            if i == "PROFILE NAME GOES HERE\n": 
+                counter = counter + 1
+                continue
 
-    title()
+            cookieList[counter] = i
+            counter = counter + 1
+
+        # If the user does not change the default values, we let the user know that no valid profile was found.
+
+        if len(cookieList) == 0:
+            clear()
+            
+            print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+        else:
+            if platform.system() == "Linux":
+                if not os.path.exists(homeDir + r'/.mozilla/firefox/' + cookieList[1]): # We try to access the Profile Folder.
+                    clear()
+                    print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    sys.exit()
+                else:
+                    return cookieList[1]
+            elif platform.system() == "Windows":
+                if not os.path.exists(homeDir + r'/Roaming/Mozilla/Firefox/Profiles/' + cookieList[0]): # We try to access the Profile Folder.
+                    clear()
+                    print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    sys.exit()
+                else:
+                    return cookieList[0]
+
+            # AppData\Roaming\Mozilla\Firefox\Profiles\ - Windows
+            # /home/blunt/.mozilla/firefox/             - Linux
 
 def checkIfProcessRunning(processName):
     # For whatever reason, a video conversion process may stall. This function kills any and all ffmpeg processes as you cannot move a file
@@ -81,6 +123,13 @@ def checkIfProcessRunning(processName):
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
     return False
+
+def clear():
+    command = 'clear' # Unix
+    if platform.system() == "Windows": command = 'cls' # Windows
+    os.system(command)
+
+    title()
 
 def convert(filename, filenamePath):
     outputPath = str(Path(filenamePath + r'/output'))
@@ -139,6 +188,35 @@ def countStrings(text):
 
     return num
 
+# Create a folder to move completed files to as to not clog up the script directory
+def createOutputFolder(currentDir):
+    outputDir = str(Path(currentDir + r'/output'))
+    boolVal = True
+    # Create the output folder
+    while boolVal:
+        try:
+            if not os.path.isdir(outputDir):
+                os.mkdir(outputDir)
+                boolVal = False
+            else:
+                boolVal = False
+        
+        # No permissions
+        except PermissionError:
+            clear()
+            print(term.brown1 + "Error: Missing required permissions. Please make sure you have read and write access to" + term.normal +
+            term.cadetblue1 + currentDir, + term.normal + "in order to create the neccessary folders.\n To try again, type y. If you would" +
+            "rather instead use the path the script is located at, type 'n'.\nTo return to the main menu, type 'menu'\n")
+
+            userInput = input(">> ")
+
+            if userInput == "y":
+                continue
+            elif userInput == "n":
+                return
+            elif userInput == "menu":
+                return
+
 def errorHandler(error, uri):
     # yt-dlp provides a more sophisicated error handler. 
     # This function strips out the first 8 characters of the error, then iterates through the error till a : is found, at which point the remaining string is
@@ -196,11 +274,15 @@ def errorHandler(error, uri):
     elif errorMessage == "Requested tweet may only be available when logged in. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
         print(term.brown1 + "ERROR 3:" + term.normal, "Twitter now requires you to log in to see any tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
 
+    # Viewing NSFW tweets now requires an account. You need to pass cookies.
+
+    elif errorMessage == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
+        print(term.brown1 + "ERROR 4:" + term.normal, "Twitter now requires you to log in to see any NSFW tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
+
     # Cookies could not be found.
 
     elif errorMessage == "Profile Folder not Found.":
-        print(term.brown1 + "ERROR 4:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
-        sys.exit()
+        print(term.brown1 + "ERROR 5:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
     
     # A fatal error has occured. Just in case its with a specific tweet, we allow the program to continue exectution.
     else:
@@ -310,7 +392,7 @@ def main():
                     noFFMPEG(0)
                 elif noComp == False:
                     multipleFileConvert()
-            elif userInput == 3: 
+            elif userInput == 3:
                 singleURLConvert()
             elif userInput == 4:
                 multipleURLConvert()
@@ -837,9 +919,8 @@ def singleURLConvert():
                 errorHandler(errorMessage, uri)
             except:
                 errorHandler(errorMessage, uri)
-            
+
             if errorMessage == "":
-            
                 filePathList = getListOfFiles(mediaPath, 1)
 
                 for fullFilenamePath in filePathList:
@@ -995,7 +1076,7 @@ def title():
 
     # Create a title bar based on the console window size
 
-    title = "[Python Video Downloader.py v1.03 - Download and compress media]"
+    title = "[Python Video Downloader.py v1.04 - Download and compress media]"
     consoleSize = shutil.get_terminal_size()
     col = int(consoleSize[0])-len(title)
 
@@ -1033,10 +1114,10 @@ def updateDependencies():
                 "\n\nIf you encounter any issues, please go to: https://github.com/jose011974/Download-Compress-Media/wiki/Create-a-Bug-Report\n")
             elif platform.system() == "Linux":
                 print("\nYour system is: Linux.\n\nThe recommended way to install pip is via your terminal. You can find common commands below:",
-                "\n\nUbuntu: sudo apt install python3-pip",
-                "\nCentOS/Fedora/Redhat: sudo dnf install python3",
-                "\nArch/Manjaro: sudo pacman -S python-pip",
-                "\nOpenSUSE: sudo zypper install python3-pip",
+                "\n\nUbuntu: sudo apt install python3-pip\n",
+                "\nCentOS/Fedora/Redhat: sudo dnf install python3\n",
+                "\nArch/Manjaro: sudo pacman -S python-pip\n",
+                "\nOpenSUSE: sudo zypper install python3-pip\n",
                 "\n\nIf you would like to install pip using a script, please go to https://bootstrap.pypa.io/get-pip.py\n")
             
             input("Press enter to exit.")
@@ -1180,11 +1261,15 @@ def downloadStatus(d):
 
         print("\nDownloading complete.\n")
 
-if platform.system() == "Linux":
-    cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
-elif platform.system() == "Windows":
-    cookie = ('firefox', 'PASTE PROFILE FOLDER NAME HERE', None, 'userContextPersonal.label')
+cookie = checkForCookies()
 
+if platform.system() == "Linux":
+    cookie = ('firefox', cookie, None, 'userContextPersonal.label')
+elif platform.system() == "Windows":
+    cookie = ('firefox', cookie, None, 'userContextPersonal.label')
+
+    # AppData\Roaming\Mozilla\Firefox\Profiles\ - Windows
+    # /home/blunt/.mozilla/firefox/             - Linux
 
 # Parameters for yt-dlp.
 # See https://github.com/yt-dlp/yt-dlp/blob/5ab3534d44231f7711398bc3cfc520e2efd09f50/yt_dlp/YoutubeDL.py#L159
@@ -1195,34 +1280,43 @@ ydl_opts = {
     'logger': MyLogger(),
     'progress_hooks': [downloadStatus],
     'cookiesfrombrowser': cookie
-
-    # AppData\Roaming\Mozilla\Firefox\Profiles\
-    # /home/blunt/.mozilla/firefox/
 }
 
 # ---------------------------------
 
 updateDependencies()
 
-while True:
+try:
+    import magic
+except:
+    clear()
+    title()
 
-    packages = ['python-magic', 'python-magic-bin']
+    print("You must restart this script in order for the magic library to work. The magic library allows the program to detect image file type.")
+    print("If you keep seeing this message, restart your PC.")
+    sys.exit()
 
-    try:
-        import magic
-        break
-    except ImportError:
-        clear()
+# Just in case this chunk is required in the future, it will stay.
 
-        print("For whatever reason, the libraries required for image detection were not installed. I will now attempt to remove and reinstall the packages containing",
-        "the libraries. Please don't bug me for a fix, this has never happened before and I don't even know what's causing it.\n\nIf you keep seeing this text after",
-        "a minute has passed, you may want to try using another program until I find a fix.")
-        time.sleep(3)
-        for p in packages:
-            subprocess.run([sys.executable, '-m', 'pip', 'uninstall', p, '-y'])
-        time.sleep(1)
-        for p in packages:
-            subprocess.run([sys.executable, '-m', 'pip', 'install', p])
+# while True:
+
+#     packages = ['python-magic', 'python-magic-bin']
+
+#     try:
+#         import magic
+#         break
+#     except ImportError:
+#         clear()
+
+#         print("For whatever reason, the libraries required for image detection were not installed. I will now attempt to remove and reinstall the packages containing",
+#         "the libraries. Please don't bug me for a fix, this has never happened before and I don't even know what's causing it.\n\nIf you keep seeing this text after",
+#         "a minute has passed, you may want to try using another program until I find a fix.")
+#         time.sleep(3)
+#         for p in packages:
+#             subprocess.run([sys.executable, '-m', 'pip', 'uninstall', p, '-y'])
+#         time.sleep(1)
+#         for p in packages:
+#             subprocess.run([sys.executable, '-m', 'pip', 'install', p])
 
 import blessed
 import datetime
@@ -1240,7 +1334,6 @@ global noComp
 term = blessed.Terminal()
 W,H = term.width, term.height
 noComp = False
-
 
 while True:
     clear()
