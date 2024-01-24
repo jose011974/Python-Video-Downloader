@@ -26,6 +26,9 @@ import webbrowser
 
 from pathlib import Path
 
+os.chdir(Path(__file__).parent.resolve()) # Sometimes the python interpreter may be set to a different path than the one where the script is located.
+
+
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"] # Used to filter out non-media files
 
 # This function uses a cookies.txt file to find and load cookies in the Firefox Profile.
@@ -603,11 +606,22 @@ def multipleURLConvert():
                     except FileNotFoundError:
                         errorMessage = "No cookies for you!: Profile Folder not Found."
                         errorHandler(errorMessage, uri)
-                    except:
-                        if eMessage != "suppress":
-                            eMessage = errorHandler(errorMessage, uri)
-                        UnhandledURLs.append(uri + "\n")
-                        currentPos = currentPos+1
+                    except Exception as e:
+
+                        try:
+                            if eMessage != "suppress":
+                                eMessage = errorHandler(errorMessage, uri)
+                                UnhandledURLs.append(uri + "\n")
+                                currentPos = currentPos+1
+                        except UnboundLocalError:
+                            clear()
+                            print("A fatal error has occured. The URL cannot be downloaded because:\n")
+                            print(str(e) + "\n")
+                            print("If the error is self explanitory, an creating issue is not necessary.\n")
+                            print("Press enter to continue.\n")
+                            input()
+
+                            currentPos = currentPos+1
 
                         clear()
                         text = "ERROR: unable to download last URL, skipping."
