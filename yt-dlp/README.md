@@ -1,4 +1,6 @@
+# NOTICE 1/28/24: 
 
+A recent Firefox update broke the way this script handles cookies! Windows systems are currently affected, I don't know if Linux is affected. I am currently working on a fix as I write this. Please do not use the script if you have updated Firefox (auto-updates are turned on so oops)
 
 # Important Notes!
 
