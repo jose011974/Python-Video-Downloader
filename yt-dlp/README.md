@@ -1,3 +1,4 @@
+
 # NOTICE 1/29/24: 
 
 A recent Firefox update broke the way this script handles cookies! Windows systems are currently affected, I don't know if Linux is affected. A fix has been found which requires updating the name in the Personal container. Despite the default name being available, the script refuses to accept it unless you assign a name to the Personal Container. Instructions are pending.
@@ -108,7 +109,8 @@ Video Tutorial: TBD
 		- **Windows 10/11:**
 			- You can install pip via the python installer or through the script linked [here](https://bootstrap.pypa.io/get-pip.py "here")
 		- **Linux:**
-			- You can install pip using the script linked [here](https://bootstrap.pypa.io/get-pip.py "here"), via your package manager, or via the terminal. Google is your friend for any distributions not listed here.
+			- You can install pip using the script linked [here](https://bootstrap.pypa.io/get-pip.py "here"), via your package manager, or via the terminal. Google is your friend for any distributions not listed here. 
+			- **NOTE:** You MAY need to add an entry to your PATH environment variable. [Click Here](https://github.com/jose011974/Python-Video-Downloader/wiki/Adding-an-entry-to-your-PATH-environment-variable-on-Linux) for more information.
 			- Ubuntu/Debian/KDE Neon: `sudo apt install python3-pip`
 			- Fedora: `sudo dnf install python3-pip`
 			- Arch: `pacman -S python-pip`
@@ -243,7 +245,7 @@ This script has been in the works since July of 2022.
 This script was created with:
 - Visual Studio Code
 - Windows Subsystems for Linux
-- VirtualBox - Used for testing on clean installs of Windows & Ubuntu/KDE Neon
+- VirtualBox - Used for testing on clean installs of Windows & Ubuntu/KDE Neon/Mint
 - Sublime Text 4
 - Lots of late nights, frustration filled days, drinking caffinated beverages, and pain.
 
