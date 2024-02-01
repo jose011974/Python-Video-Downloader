@@ -1,7 +1,7 @@
 
-# NOTICE 1/29/24: 
+# NOTICE
 
-A recent Firefox update broke the way this script handles cookies! Windows systems are currently affected, I don't know if Linux is affected. A fix has been found which requires updating the name in the Personal container. Despite the default name being available, the script refuses to accept it unless you assign a name to the Personal Container. Instructions are pending.
+A fix for the program is on the way! Just needed to let the dust settle. Version 1.04b should be out in an hour. No promises.
 
 # Important Notes!
 
