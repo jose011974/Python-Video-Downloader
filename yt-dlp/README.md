@@ -1,8 +1,4 @@
 
-# NOTICE
-
-A fix for the program is on the way! Just needed to let the dust settle. Version 1.04b should be out in an hour. No promises.
-
 # Important Notes!
 
 It is imperative that you understand that I am **NOT** responsible for any data loss that **will** occur if you do not take into account the quirks of this script.
@@ -164,7 +160,7 @@ The script will prompt you to open a file called cookies.txt, and replace "PROFI
 
 A Firefox Profile folder is essentially where all of your settings, bookmarks, history, cookies, etc. are stored for the Firefox Browser on your system.
 
-For more information, please [click here.](https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-pass-your-cookies-to-Python-Video-Downloader)
+For more information, please [click here.](https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-use-cookies.txt)
 
 If you have any issues, please go to the [troubleshooting](https://github.com/jose011974/Python-Video-Downloader/blob/main/README.md#troubleshooting "troubleshooting") section.
 
