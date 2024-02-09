@@ -1,3 +1,6 @@
+# NOTICE:
+
+Version 1.05 is in the oven. It contains a few major updates and will be released at some point this week. Then at that point the documentation will be worked on.
 
 # Important Notes!
 
