@@ -1,20 +1,21 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """ 
-    Project Name: Python Video Downloader with yt-dlp support for Microsoft Windows
+    Project Name: Python Video Downloader with yt-dlp support
     Date of Creation: 1/15/2023
-    Last Updated: 10/18/23
+    Last Updated: 2/1/24
     Python Version: Supports 3.7+
-    Version: 1.04
+    Version: 1.04b
 
-    (This release was tested on Linux, oopsie!)
+    Hotfix:
+    
+    * Cookie detection
+        * A major update under the hood for Firefox was released and re-worked the way it handles the Containers extension, which is how this script
+          handles cookies. This script has been updated to reflect that under the hood change, and will include a link to a support page on how to fix this 
+          exact issue as it involves "renaming" the Personal Container.
 
-    Changelog:
-
-    * Added an easier way to pass cookies to the script. A 'cookies.txt' file is used. It has instructions inside the file.
-    * If the magic library fails to load, we let the user know that they must restart the script.
-        * In testing, it is required to restart the script in order for the library to load correctly. I have no idea why this is required.
-    * Reogranized function order (OCD baybee!)
-
-    NOTE: It seems that the script may need to be restarted in order to allow Magic to work.
+    * Updated repo URLs
 """
 
 import fileinput
@@ -27,6 +28,9 @@ import time
 import webbrowser
 
 from pathlib import Path
+
+os.chdir(Path(__file__).parent.resolve()) # Sometimes the python interpreter may be set to a different path than the one where the script is located.
+
 
 fileTypes = [".jpeg", ".png", ".gif", ".mp4", ".webm"] # Used to filter out non-media files
 
@@ -47,7 +51,7 @@ def checkForCookies():
         f.writelines(
             ["# cookies.txt for Python Video Downloader by PineCone\n\n",
              "# Instructions: Replace 'PROFILE NAME GOES HERE' with the name of the folder that corresponds to your Firefox profile.\n",
-             "# If you don't know what any of this means, please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader\n",
+             "# If you don't know what any of this means, please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-use-cookies.txt\n",
              " \n",
              "# Windows:\n",
              "PROFILE NAME GOES HERE\n"
@@ -69,11 +73,11 @@ def checkForCookies():
         # While one index will have a placeholder value, it does not matter because there is no such thing as Winux. (Unless...?)
 
         for i in readCookieFile:
-            if i[:1] == "#" or i[:1] == "\n" or i[:1] == " ": # We filter out '#', New Line, or space characters
+            if i[:1] == "#" or i[:1] == "\n" or i[:1] == " ": # We filter out '#', New Line, or whitespace characters
                 continue
             
             # We filter out placeholder values in the file, and increment the counter.
-            # We do this in the even the user only fills out one OS. Many people do not even know what Linux is.
+            # We do this in the event the user only fills out one OS. Many people do not even know what Linux is.
 
             if i == "PROFILE NAME GOES HERE\n": 
                 counter = counter + 1
@@ -88,21 +92,35 @@ def checkForCookies():
             clear()
             
             print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+            print("Press enter to continue.")
+            input()
         else:
+            
+            # This snippet removes the '\n' from the variables in cookieList. 
+            # Otherwise the OS will try to find a path that has '\n' in it which does not exist.
+
+            windowsCookie, linuxCookie = cookieList
+            windowsCookie = windowsCookie.replace('\n', '')
+            linuxCookie = linuxCookie.replace('\n', '')
+
             if platform.system() == "Linux":
-                if not os.path.exists(homeDir + r'/.mozilla/firefox/' + cookieList[1]): # We try to access the Profile Folder.
+                if not os.path.exists(homeDir + r'/.mozilla/firefox/' + linuxCookie): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
-                    return cookieList[1]
+                    return linuxCookie
             elif platform.system() == "Windows":
-                if not os.path.exists(homeDir + r'/Roaming/Mozilla/Firefox/Profiles/' + cookieList[0]): # We try to access the Profile Folder.
+                if not os.path.exists(homeDir + r'/Roaming/Mozilla/Firefox/Profiles/' + windowsCookie): # We try to access the Profile Folder.
                     clear()
                     print("No valid profile folder was found. Please make sure the folder name matches your local system and try again.\n")
+                    print("Press enter to continue.")
+                    input()
                     sys.exit()
                 else:
-                    return cookieList[0]
+                    return windowsCookie
 
             # AppData\Roaming\Mozilla\Firefox\Profiles\ - Windows
             # /home/blunt/.mozilla/firefox/             - Linux
@@ -259,30 +277,30 @@ def errorHandler(error, uri):
     elif errorMessage == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
         print(term.brown1 + "ERROR 404-a:" + term.normal, "The URL could not be accessed. Please make sure that the URL points to a valid address.\n\n" +
             term.brown1 + "NOTE:" + term.normal, "If you are trying to download a video from Twitter, you are going to have to pass cookies in order to download the video. " +
-            "Click here for more information: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader" +
+            "Click here for more information: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader" +
             "If you are not trying to download an age restricted Twitter video, and you can access the video in question, then you may then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
     
     # JSON data cannot be grabbed. You need to pass cookies.
 
     elif errorMessage == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
         print(term.brown1 + "ERROR 404-b:" + term.normal, "JSON data could not be grabbed. A possible cause is an expired log in.\n" + 
-            "Please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader\n\n" +
+            "Please go to https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader\n\n" +
             "If you keep seeing this error, please create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
         
     # Viewing tweets requires an account. You need to pass cookies.
 
     elif errorMessage == "Requested tweet may only be available when logged in. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
-        print(term.brown1 + "ERROR 3:" + term.normal, "Twitter now requires you to log in to see any tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
+        print(term.brown1 + "ERROR 3:" + term.normal, "Twitter now requires you to log in to see any tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader")
 
     # Viewing NSFW tweets now requires an account. You need to pass cookies.
 
     elif errorMessage == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
-        print(term.brown1 + "ERROR 4:" + term.normal, "Twitter now requires you to log in to see any NSFW tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
+        print(term.brown1 + "ERROR 4:" + term.normal, "Twitter now requires you to log in to see any NSFW tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader")
 
     # Cookies could not be found.
 
     elif errorMessage == "Profile Folder not Found.":
-        print(term.brown1 + "ERROR 5:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader")
+        print(term.brown1 + "ERROR 5:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader")
     
     # A fatal error has occured. Just in case its with a specific tweet, we allow the program to continue exectution.
     else:
@@ -591,10 +609,30 @@ def multipleURLConvert():
                     except FileNotFoundError:
                         errorMessage = "No cookies for you!: Profile Folder not Found."
                         errorHandler(errorMessage, uri)
-                    except:
-                        if eMessage != "suppress":
-                            eMessage = errorHandler(errorMessage, uri)
-                        UnhandledURLs.append(uri + "\n")
+                    except Exception as e:
+                        try:
+                            if eMessage != "suppress":
+                                eMessage = errorHandler(errorMessage, uri)
+                                UnhandledURLs.append(uri + "\n")
+                                currentPos = currentPos+1
+                        except UnboundLocalError:
+                            if e.args[0] == 'could not find firefox container "Personal" in containers.json':
+                                clear()
+                                print("A fatal error has occured in attempting to grab your cookies from the cookie jar. You will not be able to" +
+                                      "use the online components of this program until the issue is fixed.\n")
+                                print("Please go here for more infomration: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader\n")
+                                print("Press Enter to continue.\n")
+                                input()
+                            else:
+                                clear()
+                                print("A fatal error has occured. The URL cannot be downloaded because:\n")
+                                print(str(e) + "\n")
+                                print("Please create an issue at the GitHub support page for this program. If the error is self-explanitory, " +
+                                      "creating an issue is NOT required.\n")
+                                print("GitHub support page: https://github.com/jose011974/Python-Video-Downloader/issues\n")
+                                print("Press enter to continue.\n")
+                                input()
+
                         currentPos = currentPos+1
 
                         clear()
@@ -878,7 +916,7 @@ def singleURLConvert():
     mediaPath = os.path.dirname(__file__)
     outputPath = str(Path(mediaPath + r'/output'))
     notFile = True
-    errorMessage = ""
+    eMessage = ""
     
     clear()
 
@@ -917,9 +955,35 @@ def singleURLConvert():
             except FileNotFoundError:
                 errorMessage = "No cookies for you!: Profile Folder not Found."
                 errorHandler(errorMessage, uri)
-            except:
-                errorHandler(errorMessage, uri)
+            except Exception as e:
+                try:
+                    if eMessage != "suppress":
+                        eMessage = errorHandler(errorMessage, uri)
 
+                        clear()
+                        text = "ERROR: unable to download last URL, skipping."
+
+                        print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
+                        countdown(3)
+                        return
+                except UnboundLocalError:
+                    if e.args[0] == 'could not find firefox container "Personal" in containers.json':
+                        clear()
+                        print("A fatal error has occured in attempting to grab your cookies from the cookie jar. You will not be able to" +
+                                "use the online components of this program until the issue is fixed.\n")
+                        print("Please go here for more infomration: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader\n")
+                        print("Press Enter to continue.\n")
+                        input()
+                    else:
+                        clear()
+                        print("A fatal error has occured. The URL cannot be downloaded because:\n")
+                        print(str(e) + "\n")
+                        print("Please create an issue at the GitHub support page for this program. If the error is self-explanitory, " +
+                                "creating an issue is NOT required.\n")
+                        print("GitHub support page: https://github.com/jose011974/Python-Video-Downloader/issues\n")
+                        print("Press enter to continue.\n")
+                        input()
+            
             if errorMessage == "":
                 filePathList = getListOfFiles(mediaPath, 1)
 
@@ -1263,10 +1327,13 @@ def downloadStatus(d):
 
 cookie = checkForCookies()
 
+# If the script errors out on "XYZ" not found in containers.json, please go to the link for more infomration:
+# https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader
+
 if platform.system() == "Linux":
-    cookie = ('firefox', cookie, None, 'userContextPersonal.label')
+    cookie = ('firefox', cookie, None, 'Personal')
 elif platform.system() == "Windows":
-    cookie = ('firefox', cookie, None, 'userContextPersonal.label')
+    cookie = ('firefox', cookie, None, 'Personal')
 
     # AppData\Roaming\Mozilla\Firefox\Profiles\ - Windows
     # /home/blunt/.mozilla/firefox/             - Linux

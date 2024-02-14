@@ -4,7 +4,7 @@
 # If you don't know what any of this means, please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-add-your-cookies-to-Python-Video-Downloader
  
 # Windows:
-PROFILE NAME GOES HERE
+fk0b1jk2.default-release
  
 # Linux:
-PROFILE NAME GOES HERE
+zzgbjldv.default-release

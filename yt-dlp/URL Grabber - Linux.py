@@ -62,6 +62,7 @@ def on_click(x, y, button, pressed):
                 if validators.url(clipboard):
                     URI.append(clipboard)
                     print("URL:", read_clipboard())
+                    pyperclip.copy('')
         
     if button == mouse.Button.middle:
         if pressed:
