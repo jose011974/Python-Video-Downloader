@@ -1,3 +1,5 @@
+# THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
+
 # Important Notes!
 
 It is imperative that you understand that I am **NOT** responsible for any data loss that **will** occur if you do not take into account the quirks of this script.
