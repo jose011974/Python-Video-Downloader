@@ -17,11 +17,23 @@
             * Added extra error handling routines (errors can and will occur)
             * Change default CRF value to 20, users will need to use a different service if the file is still too large.
                 * You can use programs such as Handbrake or ffmpeg.
+            * Spoilering and Un-Spoilering no longer overwrite those with or without the prefix in their respective modes
+                * For example, Spoiling no longer appends the prefix twice. Instead of 'SPOILER_SPOILER_filename' now you get
+                  'SPOILER_filename' and vice versa
+            * Tried to update error messages to be clear and concise. 
 
         * Misc
             * Variable names now use the following syntax: test_variable vs testVariable
             * Attempted to add useful comments and format code to be easier to read
             * Cleaned up unnecessary code
+            * 'suppress' when encountering errors actually works now (turns out its been broken for a while, oopsie)
+
+        * Hotfix - 2/12/24
+            * NSFW Tweets are now handled properly if:
+                * No active Twitter session is found in a supported browser
+                * No supported browsers are detected in their default locations
+                * Chrome is running while baking the cookies 
+                    * An update does not allow external programs to access cookies while Chrome is running
 """
 
 # Load startup libraries
@@ -99,19 +111,50 @@ def check_cookies(uri):
     counter = 0
     error_flag = ""
 
+    # We try to download the URI using Chrome or Firefox by passing the respective name into yt-dlp
+
     while True:
         try:
             ydl_opts["cookiesfrombrowser"] = [browsers[counter], None, None, None]
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([uri])
 
+            error_flag = ""
+
             break
+
+        except PermissionError:
+            clear()
+
+            print(term.brown1 + "ERROR: 'Chrome is Dumb':" + term.normal, 
+                  "Due to recent updates, external programs are unable to access cookies from Google Chrome unless the browser is closed.\n\n" + 
+                  "If you wish to download the current URL, please close Google Chrome fully and type 'retry'. Otherwise press enter to skip it.\n\n" +
+                  "You may type 'suppress' to suppress future errors.")
+            
+            user_input = input(">> ")
+
+            if user_input.lower() == "suppress":
+                return "suppress"
+            elif user_input.lower() == "retry":
+                continue
+            elif user_input.lower() == "":
+                return "no_permission"
+            else:
+                clear()
+
+                print("An invalid entry was deteced. Please try again.", end='')
+                countdown(3)
+                continue
+            
             
         except FileNotFoundError:
             error_flag = "no_browser"
             counter = counter + 1
         except yt_dlp.DownloadError:
             error_flag = "no_session"
+            counter = counter + 1
+
+        if counter == 2:
             break
     
     return error_flag
@@ -159,7 +202,7 @@ def errorHandler(error, uri):
             error_message = error[counter + 2:]
             break
     
-    # Compare the error to a list of pre-determined error messages and print an explanation of the error to the screen.
+    # Show the user an explination of the error and any possible steps they can take to resolve it.
 
     clear()
     
@@ -169,60 +212,145 @@ def errorHandler(error, uri):
         print(uri, "\n")
         print(error)
 
-    # No video in Tweet
+    # The tweet does not contain a video file, and cannot be downloaded. This is a yt-dlp issue, not mine
 
     elif error_message == "No video could be found in this tweet":
-        print(term.brown1 + "ERROR 1:" + term.normal, "The tweet does not contain a video. yt-dlp cannot download images for whatever reason. Pester them to fix the issue, not me.")
+        print(term.brown1 + "ERROR 1:" + term.normal, "The tweet does not contain a video.",
+              "yt-dlp cannot download images for whatever reason. Pester them to fix the issue, not me.")
 
     # Author of tweet has been suspended (banned)
 
     elif error_message == "Error(s) while querying API: User has been suspended.":
-        print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended, and all tweets are no longer accessible by the public.")
+        print(term.brown1 + "ERROR 2:" + term.normal, "The user that posted this tweet has been suspended,",
+              "and all tweets are no longer accessible by the public.")
         print("\nURL:", uri)
 
-    # Tweet cannot be found OR you need to sign in to view tweets because Elon.
+    # The Tweet was not found. You may need to sign in because Elon.
 
     elif error_message == "Unable to download webpage: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
-        print(term.brown1 + "ERROR 404-a:" + term.normal, "The URL could not be accessed. Please make sure that the URL points to a valid address.\n\n" +
-            term.brown1 + "NOTE:" + term.normal, "If you are trying to download a video from Twitter, you are going to have to pass cookies in order to download the video. " +
-            "Click here for more information: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader" +
-            "If you are not trying to download an age restricted Twitter video, and you can access the video in question, then you may then create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
-    
-    # JSON data cannot be grabbed. You need to sign in to view tweets because Elon.
-
-    elif error_message == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
-        print(term.brown1 + "ERROR 404-b:" + term.normal, "JSON data could not be grabbed. A possible cause is an expired log in.\n" + 
-            "Please go to https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader\n\n" +
-            "If you keep seeing this error, please create an issue at https://github.com/jose011974/Download-Compress-Media/issues")
-        
-    # Viewing tweets requires an account. You need to sign in to view tweets because Elon.
-
-    elif error_message == "Requested tweet may only be available when logged in. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
-        print(term.brown1 + "ERROR 3:" + term.normal, "Twitter now requires you to log in to see any tweet. Please log in by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader")
-
-    # Viewing Adult Tweets requires a twitter account to access. You need to sign in to Twitter because Elon.
-
-    elif error_message == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
         result = check_cookies(uri)
-
         clear()
 
         if result == "no_browser":
-            print(term.brown1 + "ERROR 4:" + term.normal, "Google Chrome or Firefox were not detected, thus a session could not be validated.\n\n",
-                  "Only Chrome and Firefox are supported in their default install locations at this time. We apologize for any inconvenience.")
+            print(term.brown1 + "ERROR 404-a:" + term.normal, "The Tweet could not be found. This may be fixed by signing into a Twitter account.",
+                    "However, a valid browser was not found.\n\n" +
+                    "You must install Chrome or Firefox and log in to download this tweet. We apologize for any inconvenience.")        
         elif result == "no_session":
-            print(term.brown1 + "ERROR 4:" + term.normal, "Twitter now requires you to log in to see most NSFW tweets. An active Twitter session",
-                "was not found via Chrome or Firefox in their default install locations.",
-                "If you don't use any of these browsers, or you installed them in a non-default location, you'll need to wait for an update or",
-                "use a supported browser in a default location. We apologize for any inconvenience.")
+            print(term.brown1 + "ERROR 404-a:" + term.normal, "The Tweet could not be found. This may be fixed by signing into a Twitter account.",
+                    "However, valid session could not be authenticated.\n\n" + 
+                    "You'll need to sign into Twitter using either Chrome or Firefox. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
+    
+    # The JSON data for the tweet could not be found. You may need to sign in because Elon
 
-    # Cookies could not be found. This should only pop-up if you do NOT have Firefox/Chrome installed.
+    elif error_message == "Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: 'Not Found'>); please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U":
+        if result == "no_browser":
+            print(term.brown1 + "ERROR 404-b:" + term.normal, "The Tweet's JSON data could not be found.",
+                    "This may be fixed by signing into a Twitter account, however, a valid browser could not be found.\n\n" +
+                    "You must install either Chrome or Firefox and log in to download this tweet. We apologize for any inconvenience.")        
+        elif result == "no_session":
+            print(term.brown1 + "ERROR 404-b:" + term.normal, "The Tweet's JSON data could not be found.",
+                    "This may be fixed by signing into a Twitter account. However, a valid Twitter session could not be authenticated.\n\n" +
+                    "You'll need to sign into Twitter using either Chrome or Firefox. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
+    
+    # The tweet could not be found. You may need to sign in because Elon.
 
+    elif error_message == "HTTP Error 404: Not Found":
+        result = check_cookies(uri)
+        clear()
+
+        if result == "no_browser":
+            print(term.brown1 + "ERROR 404-c:" + term.normal, "The Tweet could not be found.",
+                    "This may be fixed by signing into a Twitter account. However, a valid browser could not be found.\n\n" +
+                    "You must install either Chrome or Firefox and log in to download this tweet. We apologize for any inconvenience.")        
+        elif result == "no_session":
+            print(term.brown1 + "ERROR 404-c:" + term.normal, "The Tweet could not be found.",
+                    "This may be fixed by signing into a Twitter account. However, a valid Twitter session could not be authenticated.\n\n" +
+                    "You'll need to sign into Twitter using either Chrome or Firefox. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
+        
+    # Viewing NSFW tweets requires a Twitter account to view. You need to sign in to view tweets because Elon.
+
+    elif error_message == "Requested tweet may only be available when logged in. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
+        result = check_cookies(uri)
+        clear()
+
+        if result == "no_browser":
+            print(term.brown1 + "ERROR 4a:" + term.normal, "Twitter requires you to log in to view most NSFW tweets.",
+                    "However, a valid browser could not be found.\n\n"
+                    "You must install either Chrome or Firefox and log in to download this tweet. We apologize for any inconvenience.")
+        elif result == "no_session":
+            print(term.brown1 + "ERROR 4b:" + term.normal, "Twitter requires you to log in to see most NSFW tweets.",
+                    "However, a valid Twitter session could not be authenticated.\n\n" +
+                    "You'll need to sign into Twitter using either Chrome or Firefox. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
+
+    # Viewing NSFW tweets requires a twitter account to view. You need to sign in to Twitter because Elon.
+
+    elif error_message == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
+        result = check_cookies(uri)
+        clear()
+
+        if result == "no_browser":
+            print(term.brown1 + "ERROR 4c:" + term.normal, "Twitter requires you to log in to view most NSFW tweets.\n\n" + 
+                    "A valid browser could not be found.\n\n" + 
+                    "You must install either Chrome or Firefox and log in to download this tweet. We apologize for any inconvenience.")
+        elif result == "no_session":
+            print(term.brown1 + "ERROR 4d:" + term.normal, "Twitter now requires you to log in to see most NSFW tweets.",
+                    "However, a valid Twitter session could not be authenticated.\n\n" +
+                    "You'll need to sign into Twitter using either Chrome or Firefox. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
+
+    # Cookies could not be found. This may occur when a supported browser is not installed in the default location.
+    # Regardless, check_cookies will scan Chrome and Firefox in their default locations for a valid session.
+        
     elif error_message == "Profile Folder not Found.":
+        result = check_cookies(uri)
+        clear()
 
-        print(term.brown1 + "ERROR 5:" + term.normal, "Profile folder not found. Please add your profile folder by following this guide: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader")
+        if result == "no_browser":
+            print(term.brown1 + "ERROR 5a:" + term.normal, "The URL could not be authenticated as Chrome or Firefox are not installed.\n\n" + 
+                  "In order to download this URL, you will need to install Chrome or Firefox in their default location\n\n" +
+                "and log in to the respective website. We apologize for any inconvenience.")
+        elif result == "no_session":
+            print(term.brown1 + "ERROR 5b:" + term.normal, "The URL could not be authenticated as a valid session was not found.\n\n" +
+                "You will need to have Chrome or Firefox installed in their default location, signed into the respective website,",
+                 "and try again. We apologize for any inconvenience.")
+        elif result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        else:
+            return "success"
     
     # A fatal error has occured. Just in case its with a specific tweet, we allow the program to continue exectution.
+        
     else:
         print(term.brown1 + "ERROR 0a:" + term.normal, "An fatal error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
         print("include the URL and error message found below in your issue:\n")
@@ -232,6 +360,9 @@ def errorHandler(error, uri):
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
 
     user_input = input(">> ")
+
+    if user_input.lower() == "suppress":
+        return user_input
             
     clear()
 
@@ -536,24 +667,36 @@ def multipleURLConvert():
                     )
 
                     time.sleep(1)
+                    ydl_opts["cookiesfrombrowser"] = None
 
-                    # Download the media file
-
+                    # Download the media file using the parameters set in ydl_opts, then increment current_pos by 1
                     try:
                         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                             ydl.download([uri])
                         current_pos = current_pos+1
-                    except FileExistsError:
-                            os.remove(filename)
+                    except FileExistsError: # Self explanitory
+                        os.remove(filename)
+                        current_pos = current_pos+1
+                    except PermissionError:
+                        check_cookies(uri)
+
+                        if error_message == "success":
                             current_pos = current_pos+1
-                    except FileNotFoundError as e:
-                        error_message = "No cookies for you!: Profile Folder not Found."
-                        errorHandler(error_message, uri)
+                            continue
+
+                        current_pos = current_pos+1
+
+                        clear()
+                        text = "ERROR: unable to download last URL, skipping."
+
+                        print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
+                        countdown(3)
                     except Exception as e:
                         try:
                             if error_message != "suppress":
                                 error_message = errorHandler(e.args[0], uri)
                                 unhandled_urls.append(uri + "\n")
+                            current_pos = current_pos+1
                         except UnboundLocalError:
                             clear()
                             print("A fatal error has occured. The URL cannot be downloaded because:\n")
@@ -564,14 +707,18 @@ def multipleURLConvert():
                             print("Press enter to continue.\n")
                             input()
 
-                        current_pos = current_pos+1
+                            if error_message == "success":
+                                current_pos = current_pos+1
+                                continue
 
-                        clear()
-                        text = "ERROR: unable to download last URL, skipping."
+                            current_pos = current_pos+1
 
-                        print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
-                        countdown(3)
-            
+                            clear()
+                            text = "ERROR: unable to download last URL, skipping."
+
+                            print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
+                            countdown(3)
+
             # If ffmpeg is not available, do not allow the user to compress media.
             if no_comp == True:
                 noFFMPEG(1)
@@ -676,7 +823,7 @@ def multipleURLConvert():
 
             print(
                 term.move_xy(int(W/2 - (len(text[0]) + len(media_path) + len(text[1]))/2), int(H/2 + 1)) + term.palegreen + text[0] + term.cadetblue1  + ":", 
-                media_path + text[1] + term.normal,
+                media_path + r'/' + text[1]  + term.normal,
                 term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2], end='')
             input()
 
@@ -704,7 +851,7 @@ def multipleURLConvert():
                   term.cadetblue1 + text[0], 
                   term.palegreen + text[1] + term.normal, end='')
 
-        elif user_input.lower() == "no" or user_input == "n":
+        elif user_input.lower() == "no" or user_input == "n" or user_input == "":
 
             clear()
 
@@ -958,7 +1105,7 @@ def singleURLConvert():
             except Exception as e:
                 try:
                     if error_message != "suppress":
-                        error_message = errorHandler(e, uri)
+                        error_message = errorHandler(e.args[0], uri)
 
                         clear()
                         text = "ERROR: unable to download last URL, skipping."
@@ -966,23 +1113,15 @@ def singleURLConvert():
                         print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
                         countdown(3)
                         return
-                except UnboundLocalError:
-                    if e.args[0] == 'could not find firefox container "Personal" in containers.json':
-                        clear()
-                        print("A fatal error has occured in attempting to grab your cookies from the cookie jar. You will not be able to" +
-                                "use the online components of this program until the issue is fixed.\n")
-                        print("Please go here for more infomration: https://github.com/jose011974/Python-Video-Downloader/wiki/Pass-Cookies-to-Python-Video-Downloader\n")
-                        print("Press Enter to continue.\n")
-                        input()
-                    else:
-                        clear()
-                        print("A fatal error has occured. The URL cannot be downloaded because:\n")
-                        print(str(e) + "\n")
-                        print("Please create an issue at the GitHub support page for this program. If the error is self-explanitory, " +
-                                "creating an issue is NOT required.\n")
-                        print("GitHub support page: https://github.com/jose011974/Python-Video-Downloader/issues\n")
-                        print("Press enter to continue.\n")
-                        input()
+                except Exception as e:
+                    clear()
+                    print("A fatal error has occured. The URL cannot be downloaded because:\n")
+                    print(str(e.args[0]) + "\n")
+                    print("Please create an issue at the GitHub support page for this program. If the error is self-explanitory, " +
+                            "creating an issue is NOT required.\n")
+                    print("GitHub support page: https://github.com/jose011974/Python-Video-Downloader/issues\n")
+                    print("Press enter to continue.\n")
+                    input()
             
             if error_message == "":
                 file_path_list = getListOfFiles(media_path)
@@ -1088,7 +1227,7 @@ def singleURLConvert():
 
                 print(
                     term.move_xy(int(W/2 - len(text[0])/2), int(H/2 - 1)) + text[0] + "\n\n", 
-                    term.move_xy(int(W/2 - len(text[1])/2) - 2, int(H/2 + 2)) + text[1], end=''
+                    term.move_xy(int(W/2 - len(text[1])/2) - 2, int(H/2 + 2)) + term.red + text[1] + term.normal, end=''
                     )
                 
                 countdown(5)
@@ -1134,9 +1273,13 @@ def spoilMedia(option):
         input(term.move_xy(int(W/2 - len(text[2])/2), int(H/2 + 3)) + text[2])
 
         for file in file_list:
-            new_filename = file[len("SPOILER_"):]
-            os.replace(file, new_filename)
-            pass
+            if file.startswith("SPOILER_"):
+                new_filename = file[len("SPOILER_"):]
+                os.replace(file, new_filename)
+                pass
+            else:
+                pass
+            
 
     clear()
 
