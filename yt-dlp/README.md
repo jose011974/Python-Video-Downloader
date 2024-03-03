@@ -1,5 +1,7 @@
 # THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
 
+# NOTE: v1.05: I have noticed at least 2 bugs, one where the script stalls after downloading media, and another where it stalls during downloading. I have yet to find the causes of these bugs, but will keep trying to figure out what is going on.
+
 # Important Notes!
 
 It is imperative that you understand that I am **NOT** responsible for any data loss that **will** occur if you do not take into account the quirks of this script.
