@@ -1,0 +1,10 @@
+# cookies.txt for Python Video Downloader by PineCone
+
+# Instructions: Replace 'PROFILE NAME GOES HERE' with the name of the folder that corresponds to your Firefox profile.
+# If you don't know what any of this means, please go to https://github.com/jose011974/Python-Video-Downloader/wiki/How-to-use-cookies.txt
+ 
+# Windows:
+PROFILE NAME GOES HERE
+ 
+# Linux:
+PROFILE NAME GOES HERE
