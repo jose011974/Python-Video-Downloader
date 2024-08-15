@@ -9,4 +9,4 @@ Youtube-DL and yt-dlp
 
 **[yt-dlp](https://github.com/yt-dlp/yt-dlp)** is a fork of Youtube-DL; it has more features and is updated more frequently. This is the version I **recommend** using, and the version I will provide updates and fixes to.
 
-*As with any program, I (Jose Marquez) am not responsible for any loss of data when using Python Video Downloader. By downloading and using this program, you are accepting any and all risks associated with using this program.*
+*As with any program, I (PineCone) am not responsible for any loss of data when using Python Video Downloader. By downloading and using this program, you are accepting any and all risks associated with using this program.*
