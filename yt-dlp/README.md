@@ -1,3 +1,5 @@
+# UPDATE: Discord no longer offers 25 MB uploads because they are fucking dumb and are ruining their own service.
+
 # THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
 
 # Important Notes!
