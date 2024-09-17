@@ -1,6 +1,6 @@
-# THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
+# UPDATE: Discord no longer offers 25 MB uploads because they are fucking dumb and are ruining their own service.
 
-# NOTE: v1.05: I have noticed at least 2 bugs, one where the script stalls after downloading media, and another where it stalls during downloading. I have yet to find the causes of these bugs, but will keep trying to figure out what is going on.
+# THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
 
 # Important Notes!
 
