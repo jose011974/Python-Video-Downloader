@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import pyperclip
+import clipboard
 import shutil
 import platform
 import os
@@ -10,7 +7,6 @@ import validators
 import sys
 
 from pynput import mouse
-from pynput import keyboard
 
 global URI
 URI = []
@@ -26,7 +22,7 @@ def title():
 
     # Create a title bar based on the console window size
 
-    title = "[yt-dlp Multi-URL Downloader v0.01]"
+    title = "[Image URL Grabber v0.1 - 'The best grabber in town!']"
     consoleSize = shutil.get_terminal_size()
     col = int(consoleSize[0])-len(title)
 
@@ -43,7 +39,7 @@ def title():
 
 def read_clipboard():
     try:
-        clipboard_data = pyperclip.paste()
+        clipboard_data = clipboard.paste()
         return clipboard_data
     except Exception as e:
         return f"An error occurred: {e}"
@@ -54,29 +50,29 @@ def on_click(x, y, button, pressed):
             pass
         else:
             time.sleep(0.4)
-            clipboard = read_clipboard()
+            cboard = read_clipboard()
 
-            if clipboard == "" or clipboard == " ":
+            if cboard == "" or cboard == " ":
                 pass
             else:
-                if validators.url(clipboard):
-                    URI.append(clipboard)
-                    print("URL:", read_clipboard())
-                    pyperclip.copy('')
+                if validators.url(cboard):
+                    URI.append(cboard)
+                    print("URL:", cboard)
+                    clipboard.copy('')
         
     if button == mouse.Button.middle:
         if pressed:
             pass
         else:
             os.chdir(os.path.dirname(__file__))
-            filename = "URL.txt"
+            filename = "IMG URL.txt"
 
             with open(filename, 'w') as file:
                 for i in URI:
                     file.write(i + "\n")
 
             clear()
-            print("URL.txt created! Exiting...")
+            print("IMG URL.txt created! Exiting...")
             listener.stop()
             sys.exit()
 
@@ -87,7 +83,7 @@ def main():
     print("Do you wish to empty your clipboard? (y/n)\n")
     userInput = input(">> ")
     if userInput.lower() == "y":
-        pyperclip.copy('')
+        clipboard.copy('')
     
         print("\nClipboard has been cleared.\n")
     time.sleep(3)
