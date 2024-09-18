@@ -1,0 +1,11 @@
+blessed==1.20.0
+clipboard==0.0.4
+numpy==2.1.1
+Pillow==10.4.0
+psutil==6.0.0
+pynput==1.7.7
+pyperclip==1.9.0
+python_magic==0.4.27
+Requests==2.32.3
+validators==0.33.0
+yt_dlp==2024.8.6

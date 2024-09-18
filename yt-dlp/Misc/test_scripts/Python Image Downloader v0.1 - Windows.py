@@ -85,7 +85,7 @@ def getListOfFiles(folder):
     # Credit to the original source code: 
     # https://github.com/PySimpleGUI/PySimpleGUI/blob/1fa911cafee687ef50e024b580d5351c398ef7d1/DemoPrograms/Demo_Img_Viewer.py#L36
 
-def multipleURLDownload():
+def multipleImageDownload():
     
     non_file = True
     media_path = os.getcwd()
