@@ -1,4 +1,4 @@
-# UPDATE 2: KDE Neon broke during mid upgrade and broke some things. This resulted in python preferring I install virtual environments for packages. I should have done this from the beginning but was just too lazy to get it implimented. I am now working on a fix for this. The script just crashes if you try to run it with a version of python that prefers virtual envs.
+# UPDATE 2: If you get an error about virtual environments, you'll need to run 'sudo rm -rf /usr/lib/python[version]/EXTERNALLY-MANAGED' in your terminal. Note that this can cause bad things to happen to your python installation. I personally do not care about virtual environments. If you do, find another program to download videos or make your own.
 
 # UPDATE: Discord no longer offers 25 MB uploads because they are fucking dumb and are ruining their own service.
 
