@@ -1,3 +1,5 @@
+# UPDATE 2: KDE Neon broke during mid upgrade and broke some things. This resulted in python preferring I install virtual environments for packages. I should have done this from the beginning but was just too lazy to get it implimented. I am now working on a fix for this. The script just crashes if you try to run it with a version of python that prefers virtual envs.
+
 # UPDATE: Discord no longer offers 25 MB uploads because they are fucking dumb and are ruining their own service.
 
 # THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
