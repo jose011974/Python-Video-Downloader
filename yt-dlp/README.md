@@ -1,3 +1,5 @@
+# UPDATE 2: If you get an error about virtual environments, you'll need to run 'sudo rm -rf /usr/lib/python[version]/EXTERNALLY-MANAGED' in your terminal. Note that this can cause bad things to happen to your python installation. I personally do not care about virtual environments. If you do, find another program to download videos or make your own.
+
 # UPDATE: Discord no longer offers 25 MB uploads because they are fucking dumb and are ruining their own service.
 
 # THIS DOCUMENTATION IS OUT OF DATE. IT APPLIES TO VERSIONS BELOW 1.05. New documentation coming soon!
