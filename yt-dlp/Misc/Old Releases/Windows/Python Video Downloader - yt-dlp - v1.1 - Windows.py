@@ -54,7 +54,15 @@ def check_cookies(uri):
     # A website may require authentication in order to download media. This function checks Firefox and Chrome to determine if the website has
     # an active session. Other browsers are pending.
 
-    browsers = ["chrome", "firefox"]
+    # Chrome has decided to become "secure" and prevent outside sources from accessing cookies. 
+    # A fix for Windows devices involves using an extension to create a cookies.txt file, then pass that file using the --cookies option in yt-dlp.
+    # A more simpler solution is to alert the user they should use Firefox instead.
+
+    if platform.system() == "Windows":
+        browsers = ["firefox"]
+    else:
+        browsers = ["chrome", "firefox"]
+    
     counter = 0
     error_flag = ""
 
@@ -99,6 +107,19 @@ def check_cookies(uri):
         except yt_dlp.DownloadError:
             error_flag = "no_session"
             counter = counter + 1
+
+        if counter == 1 and platform.system() == "Windows":
+            clear()
+
+            print("I have deteced a Windows system with no valid session for the website you are trying to access.\n\n" +
+                  "A recent update for Chrome has renedered cookies innaccessable by outside programs. Fixes include using Linux or using Firefox.\n\n" +
+                  "A more time consuming fix is to download an extension to create a cookies.txt file that contains Netscape cookie format files, then pass " +
+                  "that file to yt-dlp.\n\n You will not be able to download videos that require authentication unless you use Firefox to sign in or " +
+                  "switch to Linux.\n\nPress Enter to continue.")
+            
+            input()
+
+            return "no_permission"
 
         if counter == 2:
             break
