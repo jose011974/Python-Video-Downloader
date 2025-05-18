@@ -736,12 +736,11 @@ def downloadSingleVideo():
 
                 print(term.move_xy(int(W/2 - len(text)/2), int(H/2)) + term.brown1 + text + term.normal, end='')
                 countdown(3)
-            
+                
             if error_message == "":
                 file_path_list = getListOfFiles(media_path)
 
                 for full_path in file_path_list:
-                    file_path = os.path.dirname(full_path)
                     filename = os.path.basename(full_path)
                     out_file = str(Path(output_path + r'/' + filename))
 
@@ -912,7 +911,7 @@ def errorHandler(error, uri):
 
     # Viewing NSFW tweets requires a twitter account to view. You need to sign in to Twitter because Elon.
 
-    elif error_message == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials":
+    elif error_message == "NSFW tweet requires authentication. Use --cookies, --cookies-from-browser, --username and --password, --netrc-cmd, or --netrc (twitter) to provide account credentials. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies":
         result = check_cookies(uri)
         clear()
 
@@ -960,13 +959,24 @@ def errorHandler(error, uri):
               "You will NOT be able to download it using this program.\n\nYour options inlcude screen recording, using the Web Debugger of your browser, " +
               "or using a browser extension.")
     
+    
     # A fatal error has occured. Just in case its with a specific tweet, we allow the program to continue exectution.
         
     else:
-        print(term.brown1 + "ERROR 0a:" + term.normal, "An fatal error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
-        print("include the URL and error message found below in your issue:\n")
-        print(uri, "\n")
-        print(error)
+        result = check_cookies(uri)
+        clear()
+
+        if result == "no_permission":
+            return ""
+        elif result == "suppress":
+            return "suppress"
+        elif result == "success":
+            return "success"
+        else:
+            print(term.brown1 + "ERROR 0a:" + term.normal, "An fatal error has occured. Please create an issue at https://github.com/jose011974/Download-Compress-Media/issues and \n")
+            print("include the URL and error message found below in your issue:\n")
+            print(uri, "\n")
+            print(error)  
 
     print("\nIf you would like to supress error messages, type 'suppress', otherwise, press enter to continue.\n")
 

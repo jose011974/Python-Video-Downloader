@@ -8,3 +8,4 @@ yt-dlp/Python Video Downloader - yt-dlp - v1.02.py
 yt-dlp/output/New folder/command.txt
 yt-dlp/cookies.txt
 *.png
+*.gif
